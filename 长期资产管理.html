@@ -914,8 +914,8 @@
           <button class="btn btn-default">重置</button>
           <div class="icon-btn" title="刷新">↻</div>
           <div class="filter-actions">
-            <button class="btn btn-default">📥 清单导入</button>
-            <button class="btn btn-default">📤 导出</button>
+            <button class="btn btn-default" style="display:none">📥 清单导入</button>
+            <button class="btn btn-default" style="display:none">📤 导出</button>
             <button class="btn btn-primary" onclick="openModal('modal-new-asset')">＋ 新增</button>
           </div>
         </div>
@@ -1111,15 +1111,15 @@
         </div>
 
         <div class="filter-bar">
-          <select class="filter-select" style="min-width:180px;" required>
-            <option value="">公司名称：请选择 *</option>
+          <select class="filter-select" style="min-width:180px;">
+            <option>全部</option>
             <option>川油能源有限公司</option>
             <option>蓉信科技有限公司</option>
             <option>东莞智造有限公司</option>
             <option>深投置业有限公司</option>
           </select>
-          <input class="filter-input" placeholder="资产编号 *" style="min-width:150px;" maxlength="200" required>
-          <input class="filter-input" placeholder="资产名称 *" style="min-width:150px;" maxlength="200" required>
+          <input class="filter-input" placeholder="资产编号" style="min-width:150px;">
+          <input class="filter-input" placeholder="资产名称" style="min-width:150px;">
           <select class="filter-select" style="min-width:130px;">
             <option>关联状态：全部</option>
             <option>未关联</option>
@@ -1149,7 +1149,7 @@
                 <th>资产类型</th>
                 <th>关联状态</th>
                 <th>已关联凭证数</th>
-                <th>已关联金额</th>
+                <th style="display:none">已关联金额</th>
                 <th style="width:120px;">操作</th>
               </tr>
             </thead>
@@ -1163,7 +1163,7 @@
                 <td>A 不动产</td>
                 <td><span class="tag tag-green">已关联</span></td>
                 <td>3</td>
-                <td>¥8,500,000.00</td>
+                <td style="display:none">¥8,500,000.00</td>
                 <td>
                   <span class="action-link" onclick="openModal('modal-guanlian')">关联凭证</span>
                 </td>
@@ -1177,7 +1177,7 @@
                 <td>C 其他长期资产</td>
                 <td><span class="tag tag-green">已关联</span></td>
                 <td>2</td>
-                <td>¥8,100,000.00 <span style="color:#999;font-size:12px;">/ 12,300,000</span></td>
+                <td style="display:none">¥8,100,000.00 <span style="color:#999;font-size:12px;">/ 12,300,000</span></td>
                 <td>
                   <span class="action-link" onclick="openModal('modal-guanlian')">关联凭证</span>
                 </td>
@@ -1191,7 +1191,7 @@
                 <td>C 其他长期资产</td>
                 <td><span class="tag tag-red">未关联</span></td>
                 <td>0</td>
-                <td>¥0.00</td>
+                <td style="display:none">¥0.00</td>
                 <td>
                   <span class="action-link" onclick="openModal('modal-guanlian')">关联凭证</span>
                 </td>
@@ -1205,7 +1205,7 @@
                 <td>A 不动产</td>
                 <td><span class="tag tag-gray">自动解除</span></td>
                 <td>0</td>
-                <td>¥0.00</td>
+                <td style="display:none">¥0.00</td>
                 <td>
                   <span class="action-link" onclick="openModal('modal-guanlian')">重新关联</span>
                   <span class="action-link">查看记录</span>
@@ -1220,7 +1220,7 @@
                 <td>A 不动产</td>
                 <td><span class="tag tag-green">已关联</span></td>
                 <td>5</td>
-                <td>¥45,600,000.00</td>
+                <td style="display:none">¥45,600,000.00</td>
                 <td>
                   <span class="action-link">关联凭证</span>
                 </td>
@@ -1234,7 +1234,7 @@
                 <td>A 不动产</td>
                 <td><span class="tag tag-green">已关联</span> <span class="tag tag-red" style="margin-left:2px;">有凭证失效</span></td>
                 <td>3</td>
-                <td>¥12,800,000.00</td>
+                <td style="display:none">¥12,800,000.00</td>
                 <td>
                   <span class="action-link" onclick="openGuanlianModal('川油能源有限公司','C26150622000000389','输油管道-川渝段')">关联凭证</span>
                 </td>
@@ -1392,8 +1392,7 @@
         <div class="filter-bar">
           <span style="color:#666;font-size:13px;">公司名称</span>
           <select class="filter-select" style="min-width:200px;">
-            <option>全部</option>
-            <option>川油能源有限公司</option>
+            <option selected>川油能源有限公司</option>
             <option>蓉信科技有限公司</option>
             <option>东莞智造有限公司</option>
             <option>深投置业有限公司</option>
@@ -1538,8 +1537,8 @@
             保存后为异步受理，需再查登记结果
             <span class="api-badge" title="保存：接口15 BCCQZCYTBGBSJ（异步）→ 查结果：接口13 CXCQZCJXSEDKTZDJJGXX">接口15 → 接口13</span>
           </span>
-          <button class="btn btn-default" id="yt-save" onclick="alert('已暂存草稿（本地示意）')">暂存</button>
-          <button class="btn btn-primary" id="yt-submit" onclick="submitYt()">保存并报送</button>
+
+          <button class="btn btn-primary" id="yt-submit" onclick="submitYt()">提交</button>
         </div>
       </div>
     </div>
@@ -1561,7 +1560,6 @@
                 <th>资产编号</th>
                 <th>资产名称</th>
                 <th>当前用途</th>
-                <th style="text-align:right;">资产净值</th>
               </tr>
             </thead>
             <tbody id="picker-tbody"></tbody>
@@ -1587,8 +1585,7 @@
         <div class="filter-bar">
           <span style="color:#666;font-size:13px;">公司名称</span>
           <select class="filter-select" style="min-width:200px;">
-            <option>全部</option>
-            <option>川油能源有限公司</option>
+            <option selected>川油能源有限公司</option>
             <option>蓉信科技有限公司</option>
             <option>东莞智造有限公司</option>
             <option>深投置业有限公司</option>
@@ -1597,7 +1594,7 @@
           <input class="filter-input" type="number" min="2026" value="2026" style="min-width:120px;" id="ho-ssq">
           <span class="form-hint">按年确认；每年1月常规确认，或处置达100%/摊销完成时提前确认</span>
           <div class="filter-actions">
-            <button class="btn btn-primary" id="ho-add" onclick="addHoRow('')">＋ 添加资产</button>
+            <button class="btn btn-primary" id="ho-add" onclick="openPicker('ho')">＋ 添加资产</button>
           </div>
         </div>
 
@@ -1653,7 +1650,7 @@
           <span class="form-hint" style="margin-right:auto;">保存后异步受理，需再查登记结果
             <span class="api-badge" title="保存：接口16 BCCQZCHHYTQRBSJ（异步）→ 查结果：接口13；前置：接口12查已确认、接口11确认已完成用途确认">接口16 → 接口13</span>
           </span>
-          <button class="btn btn-default" onclick="alert('已暂存草稿（本地示意）')">暂存</button>
+
           <button class="btn btn-primary" id="ho-submit" onclick="submitHo()">提交</button>
         </div>
       </div>
@@ -1914,6 +1911,21 @@
           </tr>
         </thead>
         <tbody id="yz-tbody">
+          <tr class="yz-summary" style="background:#F0F7FF;font-weight:500;">
+            <td class="num-col">合计</td>
+            <td style="color:#999;">—</td>
+            <td style="color:#999;text-align:center;">—</td>
+            <td><span id="yz-sum-pzje" style="padding:10px;">0.00</span></td>
+            <td style="background:#FFFDF5;"><span id="yz-sum-yzje" style="padding:10px;color:#3D7BF4;font-weight:600;">0.00</span></td>
+            <td><span id="yz-sum-kdse-row" style="padding:10px;">0.00</span></td>
+            <td><span id="yz-sum-yidk-row" style="padding:10px;">0.00</span></td>
+            <td><span id="yz-sum-yyse-row" style="padding:10px;color:#3D7BF4;">0.00</span></td>
+            <td><span id="yz-sum-yyidk-row" style="padding:10px;color:#3D7BF4;">0.00</span></td>
+            <td style="color:#999;text-align:center;">—</td>
+            <td style="color:#999;text-align:center;">—</td>
+            <td style="color:#999;text-align:center;">—</td>
+            <td style="color:#999;text-align:center;">—</td>
+          </tr>
           <tr class="yz-taxrow">
             <td class="num-col">1</td>
             <td>01 增值税专用发票 <span class="tag tag-green" style="margin-left:2px;">关联带出</span></td>
@@ -1960,7 +1972,7 @@
             <td style="color:#bbb; text-align:center;">—</td>
           </tr>
         </tbody>
-        <tfoot>
+        <tfoot style="display:none">
           <tr style="background:#F0F7FF; font-weight:500;">
             <td colspan="4" style="text-align:right; padding:10px;">合计</td>
             <td style="padding:10px; color:#3D7BF4;" id="yz-sum">5,400,000.00</td>
@@ -1995,7 +2007,7 @@
       <span class="form-hint" id="yz-edit-note" style="margin-right:auto;">⚠️ 保存后 原值 / 调整期起 / 资产用途 <strong style="color:#A8071A;">不可修改</strong>，请确认无误</span>
       <span class="form-hint" id="yz-lock-note" style="margin-right:auto; display:none;">🔒 原值 / 调整期起 / 资产用途 已锁定，仅可修改凭证及每张凭证的相关金额（接口14 czzt=2）</span>
       <button class="btn btn-default" onclick="closeModal('modal-yuanzhi-detail')">取消</button>
-      <button class="btn btn-default" id="yz-draft">暂存</button>
+
       <button class="btn btn-primary" id="yz-save" onclick="saveYz()">保存并提交</button>
     </div>
   </div>
@@ -2334,6 +2346,7 @@
     if (note) note.textContent = '（不得抵扣累计 / 查补 已按税局最新结果同步 · 接口10 / 接口8）';
   }
   let pendingYz = null;
+  let currentYzAssociated = false;
   // o = { mode:'edit'|'view', name, alias, zcbh, orig }
   function openYuanzhi(o) {
     if (ASSET_HAS_VOUCHER[o.zcbh] === false) {
@@ -2352,6 +2365,18 @@
     pendingYz = null;
     switchPage('page-guanlian', null);
   }
+  /* 资产凭证信息行显示控制：原值未填或未关联 → 仅显示合计+实际+剩余三行 */
+  function updateYzRowVisibility() {
+    const orig = ynum((document.getElementById("yz-orig") || {}).value);
+    const minimal = (!orig || !currentYzAssociated);
+    document.querySelectorAll("#yz-tbody tr").forEach(tr => {
+      if (tr.classList.contains("yz-summary")) { tr.style.display = ""; return; }
+      if (tr.classList.contains("yz-shiji"))  { tr.style.display = ""; return; }
+      if (tr.querySelector("#yz-remain"))     { tr.style.display = ""; return; }
+      tr.style.display = minimal ? "none" : "";
+    });
+    recalcYzSum();
+  }
   function doOpenYuanzhi(o) {
     const locked = (o.mode === 'view');
     document.getElementById('yz-title').textContent = '资产原值明细 - ' + o.name + '(' + o.zcbh + ')';
@@ -2361,14 +2386,16 @@
     document.getElementById('yz-alias').value = o.alias || '--';
     document.getElementById('yz-code').value = o.zcbh;
     document.getElementById('yz-orig').value = o.orig || '';
-    // 凭证区随关联情况：未关联的资产（如新增未关联）→ 无税控发票行，仅保留「未取得凭证 实际/剩余」两行供录入
-    const associated = ASSET_HAS_VOUCHER[o.zcbh] !== false;
-    document.querySelectorAll('#yz-tbody .yz-taxrow').forEach(r => r.style.display = associated ? '' : 'none');
-    if (!associated) {
+    // 凭证区随关联情况 + 原值联动：原值未填或未关联 → 仅显示合计+实际+剩余三行
+    currentYzAssociated = ASSET_HAS_VOUCHER[o.zcbh] !== false;
+    if (!currentYzAssociated) {
       const shijiJe = document.querySelector('#yz-tbody .yz-shiji .yz-je');
       if (shijiJe) shijiJe.value = '';   // 实际无票金额清空，由用户录入
     }
-    // 「未取得凭证(剩余)」行由 recalcYzSum 自动兜差（openModal 打开时会调用）
+    updateYzRowVisibility();  // 根据关联情况+原值决定行显示
+    // 原值变化时联动行显示
+    const yzOrigEl = document.getElementById('yz-orig');
+    yzOrigEl.oninput = function() { recalcYzSum(); updateYzRowVisibility(); };
     // 锁定/解锁「原值 / 调整期起 / 资产用途」三要素
     ['yz-adj', 'yz-orig'].forEach(id => {
       const el = document.getElementById(id);
@@ -2381,7 +2408,7 @@
     // 底部提示与按钮随模式切换
     document.getElementById('yz-edit-note').style.display = locked ? 'none' : '';
     document.getElementById('yz-lock-note').style.display = locked ? '' : 'none';
-    document.getElementById('yz-draft').style.display = locked ? 'none' : '';
+    var _dd=document.getElementById('yz-draft');if(_dd)_dd.style.display = locked ? 'none' : '';
     document.getElementById('yz-save').textContent = locked ? '保存修改' : '保存并提交';
     fetchBackendSummary(o.zcbh);   // 进弹窗先刷新 ④⑤⑥（接口10/接口8）
     openModal('modal-yuanzhi-detail');
@@ -2492,8 +2519,23 @@
     return Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   function assetOptions(sel) {
-    return '<option value="">请选择</option>' + Object.keys(ASSETS)
-      .map(c => `<option value="${c}" ${c === sel ? 'selected' : ''}>${c}</option>`).join('');
+    const opts = '<option value="">请选择</option>' + Object.entries(ASSETS)
+      .map(([c, a]) => `<option value="${c}" ${c === sel ? 'selected' : ''}>${c}_${a.name}</option>`).join('');
+    return opts;
+  }
+  // 展开：focus 时所有选项显示 编号_名称
+  function expandAssetOpts(el) {
+    Object.entries(ASSETS).forEach(([c, a]) => {
+      const opt = el.querySelector('option[value="' + c + '"]');
+      if (opt) opt.textContent = c + '_' + a.name;
+    });
+  }
+  // 收起：blur/change 后选中项只显示编号
+  function shrinkAssetOpts(el) {
+    const v = el.value;
+    if (v && ASSETS[v]) {
+      el.querySelector('option[value="' + v + '"]').textContent = v;
+    }
   }
   function ytSelectOptions(sel) {
     return '<option value="">请选择</option>' + YT_OPTIONS
@@ -2508,7 +2550,7 @@
     const a = ASSETS[code] || {};
     const del = `<td class="num-col"><span class="row-del" onclick="delRow(this,'${sec}')">⊖</span></td>`;
     const num = `<td class="num-col seq"></td>`;
-    const zcbh = `<td><select class="ed" onchange="onAsset(this)">${assetOptions(code)}</select></td>`;
+    const zcbh = `<td><select class="ed" onfocus="expandAssetOpts(this)" onblur="shrinkAssetOpts(this)" onchange="onAsset(this);shrinkAssetOpts(this)">${assetOptions(code)}</select></td>`;
     if (sec === '01') {
       return `<tr data-sec="01" data-code="${code}">
         ${del}${num}${zcbh}
@@ -2649,6 +2691,8 @@
     tb.querySelectorAll('.yt-empty').forEach(e => e.remove());
     tb.insertAdjacentHTML('beforeend', rowHtml(sec, code));
     const tr = tb.lastElementChild;
+    const selEl = tr.querySelector('select.ed');
+    if (selEl) shrinkAssetOpts(selEl);
     if (opts.values) {   // 回填已填写的动作列
       const v = opts.values, set = (cls, val) => { const el = tr.querySelector(cls); if (el && val != null) el.value = val; };
       set('.in-ytafter', v.after); set('.in-kdk', v.kdk); set('.in-bkdk', v.bkdk);
@@ -2700,7 +2744,8 @@
 
   // 原值明细：添加/删除凭证行（手动加的只能是 06；07/08 由系统在处置/改造时生成，不可手加）
   function renumberYz() {
-    [...document.querySelectorAll('#yz-tbody tr')].forEach((r, i) => r.children[0].textContent = i + 1);
+    let n = 0;
+    [...document.querySelectorAll('#yz-tbody tr')].forEach(r => { if (r.classList.contains('yz-summary')) return; r.children[0].textContent = ++n; });
   }
   function delYzRow(el) {
     el.closest('tr').remove();
@@ -2733,8 +2778,9 @@
   function ynum(v) { return parseFloat(String(v).replace(/[,¥\s]/g, '')) || 0; }
   function recalcYzSum() {
     // others = 税控发票行 + 未取得凭证(实际)行 的「用于金额」；剩余行(yz-remain)不带 yz-je，单独兜差
-    let others = 0, sumSe = 0, sumIdk = 0, sumKdse = 0, sumYidk = 0, sumIdkNo = 0, capBad = false;
+    let others = 0, sumSe = 0, sumIdk = 0, sumKdse = 0, sumYidk = 0, sumIdkNo = 0, sumPzje = 0, capBad = false;
     document.querySelectorAll('#yz-tbody tr').forEach(tr => {
+      if (tr.classList.contains('yz-summary')) return;
       if (tr.style.display === 'none') return;   // 隐藏行（未关联时的税控行）不计入合计
       const jeEl = tr.querySelector('.yz-je'); if (!jeEl) return;
       const je = ynum(jeEl.value);
@@ -2742,7 +2788,7 @@
       const pzje = ynum((tr.querySelector('.yz-pzje') || {}).value);   // 凭证金额
       const kdse = ynum((tr.querySelector('.yz-kdse') || {}).value);   // 凭证可抵扣税额
       const yidk = ynum((tr.querySelector('.yz-yidk') || {}).value);   // 凭证已抵扣税额
-      sumKdse += kdse; sumYidk += yidk;                                // 合计取明细累计
+      sumKdse += kdse; sumYidk += yidk; sumPzje += pzje;                          // 合计取明细累计
       const seEl = tr.querySelector('.yz-yyse');                        // 用于此项税额
       const idkEl = tr.querySelector('.yz-yyidk');                      // 用于此项已抵扣
       if (pzje > 0) {
@@ -2772,7 +2818,11 @@
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
     set('yz-sum', total); set('yz-sum-se', sumSe); set('yz-sum-idk', sumIdk);
     set('yz-sum-kdse', sumKdse); set('yz-sum-yidk', sumYidk);
-    // 计算汇总 ①②③ 实时联动（前端可算，无需接口）
+    // 更新合计行（首行）显示
+    const sumSet = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
+    sumSet('yz-sum-pzje', sumPzje); sumSet('yz-sum-yzje', orig);
+    sumSet('yz-sum-kdse-row', sumKdse); sumSet('yz-sum-yidk-row', sumYidk);
+    sumSet('yz-sum-yyse-row', sumSe); sumSet('yz-sum-yyidk-row', sumIdkNo);    // 计算汇总 ①②③ 实时联动（前端可算，无需接口）
     const setY = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = '¥' + fmt(v); };
     setY('cs-zcyz', total); setY('cs-jxse', sumSe); setY('cs-ydk', sumIdkNo);
     const bal = document.getElementById('yz-balance');
@@ -2801,7 +2851,14 @@
     const fstatus = document.getElementById('yz-f-status').value.trim();
     const fcode = document.getElementById('yz-f-code').value.trim();
     const code2 = s => { const m = String(s).match(/\d{2}/); return m ? m[0] : ''; };
+    const orig = ynum((document.getElementById('yz-orig') || {}).value);
+    const minimal = (!orig || !currentYzAssociated);
     document.querySelectorAll('#yz-tbody tr').forEach(tr => {
+      if (tr.classList.contains('yz-summary')) return;      // 合计行始终显示
+      if (tr.classList.contains('yz-shiji'))  { tr.style.display = ''; return; }  // 实际行始终显示
+      if (tr.querySelector('#yz-remain'))     { tr.style.display = ''; return; }  // 剩余行始终显示
+      if (minimal) { tr.style.display = 'none'; return; }   // 原值未填/未关联 → 隐藏税控行和手录行
+      // 正常模式：按筛选条件过滤
       const c = tr.children;
       const typeText = c[1].textContent.trim();
       const codeInput = c[2].querySelector('input');
@@ -2913,14 +2970,9 @@
     const status = selects[1].value;
     const type = selects[2].value;
     
-    // 必填校验
-    if (!company) { alert('请选择公司名称'); return; }
-    if (!zcbh) { alert('请输入资产编号'); return; }
-    if (!name) { alert('请输入资产名称'); return; }
-    
     const rows = document.querySelectorAll('#tbody-guanlian tr');
     rows.forEach(row => {
-      if (row.style.display === 'none') return; // 已隐藏的行不处理
+      if (row.style.display === 'none') return;
       const cells = row.querySelectorAll('td');
       if (cells.length < 10) return;
       const rowCompany = cells[2].textContent.trim();
@@ -2930,7 +2982,7 @@
       const rowStatus = cells[6].textContent.trim();
       
       let show = true;
-      if (company && rowCompany !== company) show = false;
+      if (company && company !== '全部' && rowCompany !== company) show = false;
       if (zcbh && !rowZcbh.includes(zcbh)) show = false;
       if (name && !rowName.includes(name)) show = false;
       if (status && status !== '关联状态：全部' && !rowStatus.includes(status.replace('关联状态：', ''))) show = false;
@@ -3017,7 +3069,7 @@
     return `<tr data-code="${code}">
       <td class="num-col"><span class="row-del" onclick="delHoRow(this)">⊖</span></td>
       <td class="num-col seq"></td>
-      <td><select class="ed in-code" onchange="onHoAsset(this)">${assetOptions(code)}</select></td>
+      <td><select class="ed in-code" onfocus="expandAssetOpts(this)" onblur="shrinkAssetOpts(this)" onchange="onHoAsset(this);shrinkAssetOpts(this)">${assetOptions(code)}</select></td>
       <td class="c-name">${a.name || '—'}</td>
       <td class="ro c-fhtj">${fmt(a.ydk)}</td>
       <td class="ro c-adj">${a.adj ?? '—'}</td>
@@ -3082,6 +3134,8 @@
     const tb = document.getElementById('ho-tbody');
     tb.querySelectorAll('.yt-empty').forEach(e => e.remove());
     tb.insertAdjacentHTML('beforeend', hoRowHtml(code || ''));
+    const hoSel = tb.lastElementChild.querySelector('.in-code');
+    if (hoSel) shrinkAssetOpts(hoSel);
     recalcHoRow(tb.lastElementChild);
     renumberHo();
   }
@@ -3182,17 +3236,36 @@
   function openPicker(sec) {
     pickerTarget = sec;
     const tb = document.getElementById('picker-tbody');
-    tb.innerHTML = Object.entries(ASSETS).map(([c, a]) => `
-      <tr onclick="const b=this.querySelector('input');b.checked=!b.checked;">
-        <td><input type="checkbox" value="${c}" onclick="event.stopPropagation()"></td>
-        <td>${c}</td><td>${a.name}</td><td>${a.yt}</td>
-        <td style="text-align:right;">${fmt(netNow(a))}</td>
-      </tr>`).join('');
+    const titleEl = document.querySelector('#modal-asset-picker .modal-title');
+    if (sec === 'ho') {
+      titleEl.innerHTML = '添加资产（混合用途确认）<span class="api-badge" title="可确认资产列表来自接口12/接口10，筛选当年存在混合用途的台账">API</span>';
+      tb.innerHTML = Object.entries(ASSETS)
+        .filter(([c, a]) => a.yt.includes('02'))
+        .map(([c, a]) => `
+          <tr onclick="const b=this.querySelector('input');b.checked=!b.checked;">
+            <td><input type="checkbox" value="${c}" onclick="event.stopPropagation()"></td>
+            <td>${c}</td><td>${a.name}</td><td>${a.yt}</td>
+          </tr>`).join('');
+      if (!tb.innerHTML) {
+        tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#bbb;padding:20px;">暂无符合条件的混合用途资产</td></tr>';
+      }
+    } else {
+      titleEl.innerHTML = '添加资产<span class="api-badge" title="可变更资产列表来自接口11 CXCQZCYTBGBSJ / 接口10 台账数据">API</span>';
+      tb.innerHTML = Object.entries(ASSETS).map(([c, a]) => `
+        <tr onclick="const b=this.querySelector('input');b.checked=!b.checked;">
+          <td><input type="checkbox" value="${c}" onclick="event.stopPropagation()"></td>
+          <td>${c}</td><td>${a.name}</td><td>${a.yt}</td>
+        </tr>`).join('');
+    }
     openModal('modal-asset-picker');
   }
   function confirmPicker() {
     const checks = document.querySelectorAll('#picker-tbody input[type=checkbox]:checked');
-    checks.forEach(c => addRow(pickerTarget, c.value));
+    if (pickerTarget === 'ho') {
+      checks.forEach(c => addHoRow(c.value));
+    } else {
+      checks.forEach(c => addRow(pickerTarget, c.value));
+    }
     closeModal('modal-asset-picker');
   }
 
@@ -3225,7 +3298,7 @@
     if (state === 'draft') {
       bar.style.display = 'none';
       lockTables(false);
-      submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '保存并报送';
+      submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '提交';
       return;
     }
     bar.style.display = 'flex';
@@ -3239,7 +3312,7 @@
       badge.textContent = '✓ 登记成功';
       msg.textContent = 'returncode=00，已回写各行变更UUID（后续修改/作废凭此定位）';
       lockTables(false);
-      submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '保存并报送';
+      submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '提交';
       refreshBtn.style.display = 'none'; resetBtn.style.display = '';
     } else if (state === 'failed') {
       badge.textContent = '✕ 登记失败';
