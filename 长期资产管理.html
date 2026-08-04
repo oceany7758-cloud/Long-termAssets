@@ -734,6 +734,7 @@
   /* 锁定态：隐藏加/删行、去掉可编辑外观 */
   .yt-locked .add-row { display: none; }
   .yt-locked .row-del { visibility: hidden; }
+  .yt-locked .row-act { display: none; }
   .yt-locked .yt-table td .ed { border-color: transparent !important; background: transparent !important; }
   .row-ok { color: #52C41A; font-weight: 700; cursor: help; }
   /* 已登记行 / 作废行 / 行内操作 */
@@ -818,7 +819,7 @@
         <!-- 「资产原值明细」独立页已收敛到台账原值列弹窗，先注释保留，将来如需批量视图再启用
         <div class="submenu-item" onclick="switchPage('page-yuanzhi', this)">资产原值明细</div>
         -->
-        <div class="submenu-item" onclick="switchPage('page-yongtu', this)">用途/状态变更</div>
+        <div class="submenu-item" onclick="switchPage('page-yongtu', this)">用途状态变更</div>
         <div class="submenu-item" onclick="switchPage('page-hunhe', this)">混合用途确认</div>
       </div>
     </div>
@@ -884,6 +885,13 @@
               <option>03 专用于不允许抵扣项目或非正常损失</option>
             </select>
           </div>
+          <div class="qf-item"><label>作废状态</label>
+            <select class="filter-select">
+              <option>全部</option>
+              <option>正常</option>
+              <option>已作废</option>
+            </select>
+          </div>
 
           <div class="qf-item"><label>调整期起</label>
             <div class="month-range">
@@ -945,6 +953,7 @@
                 <th>有效期起</th>
                 <th>有效期止</th>
                 <th>办理状态</th>
+                <th>作废状态</th>
                 <th style="width:170px;">操作</th>
               </tr>
             </thead>
@@ -971,6 +980,7 @@
                 <td style="color:#bbb;">—</td>
                 <td style="color:#bbb;">—</td>
                 <td><span class="tag tag-orange">待补录原值</span></td>
+                <td><span style="color:#bbb;">--</span></td>
                 <td>
                   <span class="action-link" onclick="gotoGuanlian('C26150622000000257')">关联凭证</span>
                   <span class="action-link danger" onclick="voidAsset('C26150622000000257')">作废</span>
@@ -997,6 +1007,7 @@
                 <td>2026-03-01</td>
                 <td>2046-02-28</td>
                 <td><span class="tag tag-green">已完成</span></td>
+                <td><span style="color:#bbb;">--</span></td>
                 <td>
                   <span class="action-link danger" onclick="voidAsset('ZC20260315001')">作废</span>
                 </td>
@@ -1022,6 +1033,7 @@
                 <td style="color:#bbb;">—</td>
                 <td style="color:#bbb;">—</td>
                 <td><span class="tag tag-orange">待补录原值</span></td>
+                <td><span style="color:#bbb;">--</span></td>
                 <td>
                   <span class="action-link" onclick="gotoGuanlian('ZC20260320001')">关联凭证</span>
                   <span class="action-link danger" onclick="voidAsset('ZC20260320001')">作废</span>
@@ -1048,6 +1060,7 @@
                 <td>2026-06-01</td>
                 <td>2046-05-31</td>
                 <td><span class="tag tag-green">已完成</span></td>
+                <td><span style="color:#bbb;">--</span></td>
                 <td>
                   <span class="action-link danger" onclick="voidAsset('ZC20260610001')">作废</span>
                 </td>
@@ -1073,9 +1086,35 @@
                 <td>2026-05-01</td>
                 <td>2046-04-30</td>
                 <td><span class="tag tag-green">已完成</span></td>
+                <td><span style="color:#bbb;">--</span></td>
                 <td>
                   <span class="action-link danger" onclick="voidAsset('ZC20260501001')">作废</span>
                 </td>
+              </tr>
+              <!-- 已作废示例行 -->
+              <tr class="row-void" style="opacity:.55;">
+                <td><input type="checkbox" disabled></td>
+                <td>6</td>
+                <td>蓉信科技有限公司</td>
+                <td class="cell-primary" style="text-decoration:line-through;">ZC20260701006</td>
+                <td style="text-decoration:line-through;">成都仓库</td>
+                <td style="text-decoration:line-through;">仓库</td>
+                <td style="text-decoration:line-through;">A 不动产</td>
+                <td style="text-decoration:line-through;">240</td>
+                <td style="text-decoration:line-through;">¥12,000,000.00</td>
+                <td style="text-decoration:line-through;">¥1,080,000.00</td>
+                <td style="text-decoration:line-through;">¥1,080,000.00</td>
+                <td><span class="tag tag-blue" style="opacity:.6;">一般计税</span></td>
+                <td><span class="tag tag-green" style="opacity:.6;">在用</span></td>
+                <td style="text-decoration:line-through;">2026-07-01</td>
+                <td style="text-decoration:line-through;">¥0.00</td>
+                <td style="text-decoration:line-through;">¥0.00</td>
+                <td style="text-decoration:line-through;">¥0.00</td>
+                <td style="text-decoration:line-through;">2026-07-01</td>
+                <td style="text-decoration:line-through;">2046-06-30</td>
+                <td><span class="tag tag-gray" style="opacity:.6;">已完成</span></td>
+                <td><span class="tag tag-red">已作废</span></td>
+                <td><span style="color:#bbb;font-size:12px;">不可操作</span></td>
               </tr>
             </tbody>
           </table>
@@ -1407,6 +1446,12 @@
             <label id="lbl-04"><input type="checkbox" id="chk-04" checked onchange="toggleType('04')"> 已全额摊销</label>
           </div>
           <span class="form-hint">勾选变更类型展开对应明细表；提交时勾选项拼为 bglx3="01,02,…"</span>
+          <span style="color:#666;font-size:13px;margin-left:16px;">作废状态</span>
+          <select class="filter-select" id="yt-zfbz-filter" onchange="filterYtZfbz()" style="min-width:100px;">
+            <option value="">全部</option>
+            <option value="N">正常</option>
+            <option value="Y">已作废</option>
+          </select>
         </div>
         <div class="form-hint" id="yt-period-note"></div>
 
@@ -1445,9 +1490,27 @@
                 <th>上次变化时资产净值</th>
                 <th>本次变动时资产净值 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>不得抵扣进项税额（参考）</th>
+                <th>作废状态</th>
               </tr>
             </thead>
-            <tbody id="tbody-01"></tbody>
+            <tbody id="tbody-01">
+            <!-- 已作废示例行 -->
+            <tr data-sec="01" data-code="ZC20260701006" data-reg="1" data-uuid="BG-DEMO01" data-zfbz="Y" class="row-reg row-void">
+              <td class="num-col"><span class="row-ok" title="变更UUID：BG-DEMO01">✓</span><span class="row-act mod" style="display:none;">编辑</span><span class="row-act void" style="color:#999;cursor:default;">已作废</span></td>
+              <td class="num-col seq">1</td>
+              <td><select class="ed" disabled><option selected>ZC20260701006_成都仓库</option></select></td>
+              <td class="c-name">成都仓库</td>
+              <td class="ro c-ydk">540,000</td>
+              <td class="ro c-months">1</td>
+              <td class="c-ytnow">01 专用于一般计税</td>
+              <td><select class="ed in-ytafter" disabled><option selected>02 用于混合用途</option></select></td>
+              <td class="ro c-yz">6,000,000</td>
+              <td class="ro c-scjz">—</td>
+              <td class="ro c-bcjz">5,975,000</td>
+              <td class="ref-val out-ref">22,500</td>
+              <td class="zfzt-cell"><span class="tag tag-red">已作废</span></td>
+            </tr>
+          </tbody>
           </table>
         </div>
 
@@ -1475,6 +1538,7 @@
                 <th style="min-width:120px;">*处置（不可抵扣情形）比例</th>
                 <th>资产处置比例</th>
                 <th>不得抵扣进项税额（参考）</th>
+                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-02"></tbody>
@@ -1502,6 +1566,7 @@
                 <th>变动时资产净值 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>尚未调整的资产比例 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>尚未调整的进项税额</th>
+                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-03"></tbody>
@@ -1525,6 +1590,7 @@
                 <th>资产名称</th>
                 <th>有效期起</th>
                 <th>资产已调整月份</th>
+                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-04"></tbody>
@@ -1593,6 +1659,12 @@
           <span style="color:#666;font-size:13px;">所属期(年)</span>
           <input class="filter-input" type="number" min="2026" value="2026" style="min-width:120px;" id="ho-ssq">
           <span class="form-hint">按年确认；每年1月常规确认，或处置达100%/摊销完成时提前确认</span>
+          <span style="color:#666;font-size:13px;margin-left:16px;">作废状态</span>
+          <select class="filter-select" id="ho-zfbz-filter" onchange="filterHoZfbz()" style="min-width:100px;">
+            <option value="">全部</option>
+            <option value="N">正常</option>
+            <option value="Y">已作废</option>
+          </select>
           <div class="filter-actions">
             <button class="btn btn-primary" id="ho-add" onclick="openPicker('ho')">＋ 添加资产</button>
           </div>
@@ -1633,12 +1705,85 @@
                 <th>用于简易/免税/非应税进项税额 ⑯<br><span style="color:#bbb;font-weight:normal;">=(⑧−⑮)×(⑩+⑪+⑫)/(⑬+⑭)</span></th>
                 <th>混用不得抵扣进项税额(参考) ⑰<br><span style="color:#bbb;font-weight:normal;">=⑮+⑯</span></th>
                 <th style="min-width:90px;">*是否已确认 ⑱</th>
+                <th>作废状态</th>
               </tr>
             </thead>
-            <tbody id="ho-tbody"></tbody>
+            <tbody id="ho-tbody">
+          <!-- 模拟已确认数据：支持编辑/作废 -->
+          <tr data-code="ZC20260315001" data-reg="1" data-zfbz="N" class="row-reg">
+            <td class="num-col"><span class="row-act mod" onclick="editHoRow(this)">编辑</span> <span class="row-act void" onclick="toggleVoidHo(this)">作废</span></td>
+            <td class="num-col">1</td>
+            <td><select class="ed in-code" disabled><option value="ZC20260315001" selected>ZC20260315001_成都总部办公楼</option></select></td>
+            <td class="c-name">成都总部办公楼</td>
+            <td class="ro c-fhtj">450,000.00</td>
+            <td class="ro c-adj">240</td>
+            <td><select class="ed in-tzlx" disabled><option selected>年终混合用途确认</option></select></td>
+            <td><input class="ed in-m6" value="6" disabled></td>
+            <td><input class="ed in-c7" value="200,000.00" disabled></td>
+            <td class="ro out-c8">112,500.00</td>
+            <td><input class="ed in-c9" value="100,000.00" disabled></td>
+            <td><input class="ed in-c10" value="0" disabled></td>
+            <td><input class="ed in-c11" value="0" disabled></td>
+            <td><input class="ed in-c12" value="0" disabled></td>
+            <td><input class="ed in-c13" value="8,000,000.00" disabled></td>
+            <td><input class="ed in-c14" value="0" disabled></td>
+            <td class="ro ref-val out-c15">56,250.00</td>
+            <td class="ro ref-val out-c16">0.00</td>
+            <td class="ref-val out-c17">56,250.00</td>
+            <td><select class="ed in-qr" disabled><option selected>是</option></select></td>
+            <td class="zfzt-cell">—</td>
+          </tr>
+          <tr data-code="ZC20260320002" data-reg="1" data-zfbz="N" class="row-reg">
+            <td class="num-col"><span class="row-act mod" onclick="editHoRow(this)">编辑</span> <span class="row-act void" onclick="toggleVoidHo(this)">作废</span></td>
+            <td class="num-col">2</td>
+            <td><select class="ed in-code" disabled><option value="ZC20260320002" selected>ZC20260320002_运输货车-川A·88888</option></select></td>
+            <td class="c-name">运输货车-川A·88888</td>
+            <td class="ro c-fhtj">26,000.00</td>
+            <td class="ro c-adj">60</td>
+            <td><select class="ed in-tzlx" disabled><option selected>资产停止使用一次性调整（资产整体处置）</option></select></td>
+            <td><input class="ed in-m6" value="4" disabled></td>
+            <td><input class="ed in-c7" value="30,000.00" disabled></td>
+            <td class="ro out-c8">1,733.33</td>
+            <td><input class="ed in-c9" value="15,000.00" disabled></td>
+            <td><input class="ed in-c10" value="500,000.00" disabled></td>
+            <td><input class="ed in-c11" value="0" disabled></td>
+            <td><input class="ed in-c12" value="100,000.00" disabled></td>
+            <td><input class="ed in-c13" value="3,000,000.00" disabled></td>
+            <td><input class="ed in-c14" value="500,000.00" disabled></td>
+            <td class="ro ref-val out-c15">866.67</td>
+            <td class="ro ref-val out-c16">178.57</td>
+            <td class="ref-val out-c17">1,045.24</td>
+            <td><select class="ed in-qr" disabled><option selected>是</option></select></td>
+            <td class="zfzt-cell">—</td>
+          </tr>
+          <!-- 已作废示例行 -->
+          <tr data-code="ZC20260701006" data-reg="1" data-zfbz="Y" class="row-reg row-void">
+            <td class="num-col"><span class="row-ok" title="确认UUID：HH-DEMO01">✓</span></td>
+            <td class="num-col">3</td>
+            <td><select class="ed in-code" disabled><option value="ZC20260701006" selected>ZC20260701006_成都仓库</option></select></td>
+            <td class="c-name">成都仓库</td>
+            <td class="ro c-fhtj">540,000.00</td>
+            <td class="ro c-adj">240</td>
+            <td><select class="ed in-tzlx" disabled><option selected>年终混合用途确认</option></select></td>
+            <td><input class="ed in-m6" value="0" disabled></td>
+            <td><input class="ed in-c7" value="0" disabled></td>
+            <td class="ro out-c8">0.00</td>
+            <td><input class="ed in-c9" value="0" disabled></td>
+            <td><input class="ed in-c10" value="0" disabled></td>
+            <td><input class="ed in-c11" value="0" disabled></td>
+            <td><input class="ed in-c12" value="0" disabled></td>
+            <td><input class="ed in-c13" value="0" disabled></td>
+            <td><input class="ed in-c14" value="0" disabled></td>
+            <td class="ro ref-val out-c15">0.00</td>
+            <td class="ro ref-val out-c16">0.00</td>
+            <td class="ref-val out-c17">0.00</td>
+            <td><select class="ed in-qr" disabled><option>否</option></select></td>
+            <td class="zfzt-cell"><span class="tag tag-red">已作废</span></td>
+          </tr>
+        </tbody>
             <tfoot>
               <tr style="background:#F0F7FF; font-weight:600;">
-                <td colspan="18" style="text-align:right; padding:10px;">混用不得抵扣进项税额(参考) 合计</td>
+                <td colspan="19" style="text-align:right; padding:10px;">混用不得抵扣进项税额(参考) 合计</td>
                 <td class="ref-val" id="ho-total-c17" style="padding:10px;">0.00</td>
                 <td></td>
               </tr>
@@ -1756,7 +1901,6 @@
             <th>开具时间</th>
             <th>可抵扣税额</th>
             <th>已抵扣税额</th>
-            <th style="width:50px;">操作</th>
           </tr>
         </thead>
         <tbody id="gl-tbody">
@@ -1859,7 +2003,7 @@
       <div class="section-title">资产凭证信息（凭证拆分）</div>
       <div class="info-box blue" style="margin:0 0 8px;">
         💡 <strong>税控发票行</strong>（01/02/03/04/05，标「关联带出」）由凭证关联带入（接口9），凭证类型/号码/金额/税额只读，增删请到「发票关联确认」页；用户只改「用于此项资产的金额」拆分，<strong>用于税额/已抵扣按 可抵扣税额×用于金额÷凭证金额 自动算、只读</strong>。<br>
-        <strong>未取得凭证或其他凭证</strong>固定两行、不可增删：<strong>「实际」行</strong>手填该资产的无票金额；<strong>「剩余」行</strong>由系统自动 = 资产原值 − 税控用于 − 实际无票，置灰不可改，保证合计恒 = 资产原值。两行均无发票，故税额相关列为「—」。
+        <strong>未取得凭证或其他凭证</strong>固定两行、不可增删：<strong>「实际」行</strong>手填该资产的无票金额，「用于此项资产的增值税税额」显示「—」（无发票无法价税分离）；<strong>「剩余」行</strong>由系统自动 = 资产原值 − 税控用于 − 实际无票，置灰不可改，保证合计恒 = 资产原值。两行的「用于此项资产的已抵扣税额」均为用户自行录入。
       </div>
 
       <!-- 凭证筛选 -->
@@ -1907,7 +2051,6 @@
             <th>凭证状态</th>
             <th>开具时间</th>
             <th style="min-width:90px;">是否办法第十五条"资本化改造支出以外"对应凭证</th>
-            <th style="width:50px;">操作</th>
           </tr>
         </thead>
         <tbody id="yz-tbody">
@@ -1921,7 +2064,6 @@
             <td><span id="yz-sum-yidk-row" style="padding:10px;">0.00</span></td>
             <td><span id="yz-sum-yyse-row" style="padding:10px;color:#3D7BF4;">0.00</span></td>
             <td><span id="yz-sum-yyidk-row" style="padding:10px;color:#3D7BF4;">0.00</span></td>
-            <td style="color:#999;text-align:center;">—</td>
             <td style="color:#999;text-align:center;">—</td>
             <td style="color:#999;text-align:center;">—</td>
             <td style="color:#999;text-align:center;">—</td>
@@ -1939,8 +2081,7 @@
             <td><input value="正常" readonly></td>
             <td><input value="2026-05-27" readonly></td>
             <td><select class="ed-y"><option>否</option><option>是</option></select></td>
-            <td><span style="color:#bbb;cursor:help;" title="税控发票由凭证关联带入（接口9），类型/号码/金额只读；增删请到「发票关联确认」页">🔒</span></td>
-          </tr>
+            </tr>
           <tr class="yz-shiji">
             <td class="num-col">2</td>
             <td>未取得凭证或其他凭证 <span class="tag tag-gray" style="margin-left:2px;">实际</span></td>
@@ -1949,12 +2090,11 @@
             <td style="background:#FFFDF5;"><input class="ed-y yz-je" value="400,000.00" oninput="recalcYzSum()"></td>
             <td style="color:#bbb; text-align:center;">—</td>
             <td style="color:#bbb; text-align:center;">—</td>
-            <td><input value="0.00" readonly class="yz-yyse"></td>
+            <td style="color:#bbb; text-align:center;">—</td>
             <td style="background:#FFFDF5;"><input class="ed-y yz-yyidk" placeholder="自行录入" oninput="recalcYzSum()"></td>
             <td style="color:#bbb; text-align:center;">—</td>
             <td><input value="2026-06-25" readonly></td>
             <td><input value="是" readonly style="background:#F5F7FA;color:#888;"></td>
-            <td style="color:#bbb; text-align:center;">—</td>
           </tr>
           <tr>
             <td class="num-col">3</td>
@@ -1965,7 +2105,7 @@
             <td style="color:#bbb; text-align:center;">—</td>
             <td style="color:#bbb; text-align:center;">—</td>
             <td style="color:#bbb; text-align:center;">—</td>
-            <td style="color:#bbb; text-align:center;">—</td>
+            <td style="background:#FFFDF5;"><input class="ed-y yz-yyidk" placeholder="自行录入" oninput="recalcYzSum()"></td>
             <td style="color:#bbb; text-align:center;">—</td>
             <td><input value="2026-06-25" readonly></td>
             <td><input value="否" readonly style="background:#F5F7FA;color:#888;"></td>
@@ -1987,10 +2127,10 @@
       </div>
       <div id="yz-balance" class="form-hint" style="margin-top:6px;"></div>
 
-      <div class="section-title">计算汇总（回填台账）
+      <div class="section-title" style="display:none">计算汇总（回填台账）
         <span class="form-hint" id="cs-sync-note" style="margin-left:8px; font-weight:normal;"></span>
       </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; background:#F5F7FA; padding:14px 16px; border-radius:4px; font-size:13px;">
+      <div style="display:none; grid-template-columns:1fr 1fr; gap:12px 24px; background:#F5F7FA; padding:14px 16px; border-radius:4px; font-size:13px;">
         <div><span style="color:#999;">资产原值 zcyz2：</span><strong id="cs-zcyz" style="color:#3D7BF4;">¥0.00</strong> <span style="color:#bbb;">= Σ用于此项金额（实时）</span></div>
         <div><span style="color:#999;">符合条件的进项税额 fhtjdjxse：</span><strong id="cs-jxse">¥0.00</strong> <span style="color:#bbb;">= Σ用于此项税额（仅"否"+正常/部分红冲）</span></div>
         <div><span style="color:#999;">符合条件的已抵扣 fhtjdydkjxse：</span><strong id="cs-ydk">¥0.00</strong> <span style="color:#bbb;">仅"否"的凭证计入（实时）</span></div>
@@ -2563,6 +2703,7 @@
         <td class="ro c-scjz">—</td>
         <td class="ro c-bcjz">—</td>
         <td class="ref-val out-ref">—</td>
+        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     if (sec === '02') {
@@ -2578,6 +2719,7 @@
         <td><input class="ed in-bkdk" value="0" oninput="recalc(this)"></td>
         <td class="ro out-czbl">0.00%</td>
         <td class="ref-val out-ref">—</td>
+        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     if (sec === '03') {
@@ -2590,6 +2732,7 @@
         <td class="ro c-bdjz">—</td>
         <td class="ro c-wtzbl">—</td>
         <td class="ref-val out-ref">—</td>
+        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     // 04 已全额摊销
@@ -2598,6 +2741,7 @@
       <td class="c-name">${a.name || '—'}</td>
       <td class="ro c-yxqq">${a.yxqq || '—'}</td>
       <td class="ro c-months">${a.months ?? '—'}</td>
+      <td class="zfzt-cell">—</td>
     </tr>`;
   }
 
@@ -2669,7 +2813,7 @@
     // 空态
     tb.querySelectorAll('.yt-empty').forEach(e => e.remove());
     if (rows.length === 0) {
-      const colspan = { '01': 12, '02': 13, '03': 10, '04': 6 }[sec];
+      const colspan = { '01': 13, '02': 14, '03': 11, '04': 7 }[sec];
       tb.insertAdjacentHTML('beforeend', `<tr class="yt-empty"><td colspan="${colspan}">暂无数据，点击右上「＋ 添加资产」</td></tr>`);
     }
   }
@@ -2712,9 +2856,10 @@
     const cell = tr.querySelector('td.num-col');
     cell.innerHTML =
       `<span class="row-ok" title="变更UUID：${tr.dataset.uuid}">✓</span>` +
-      `<span class="row-act mod" title="修改" onclick="editRow(this)">✎</span>` +
-      `<span class="row-act void" title="作废" onclick="voidRow(this)">⊘</span>`;
+      `<span class="row-act mod" onclick="editRow(this)">编辑</span>` +
+      `<span class="row-act void" onclick="voidRow(this)">作废</span>`;
     if (voided) setVoid(tr, true);
+    updateZfztCell(tr);
   }
   // 已登记行 → 修改：仅解锁动作列（保留只读带出列）
   function editRow(el) {
@@ -2722,20 +2867,32 @@
     if (tr.classList.contains('row-void')) return;
     const editing = tr.classList.toggle('row-editing');
     tr.querySelectorAll('.in-ytafter, .in-kdk, .in-bkdk').forEach(x => x.disabled = !editing);
-    el.textContent = editing ? '↩' : '✎';
-    el.title = editing ? '撤销修改' : '修改';
+    el.textContent = editing ? '取消编辑' : '编辑';
+    
   }
   // 已登记行 → 作废/恢复
   function voidRow(el) {
     const tr = el.closest('tr');
     const v = !tr.classList.contains('row-void');
     setVoid(tr, v);
-    el.textContent = v ? '↺' : '⊘';
-    el.title = v ? '恢复' : '作废';
+    el.textContent = v ? '取消作废' : '作废';
+    
   }
   function setVoid(tr, v) {
     tr.classList.toggle('row-void', v);
     tr.dataset.zfbz = v ? 'Y' : 'N';
+    updateZfztCell(tr);
+  }
+  function updateZfztCell(tr) {
+    const cell = tr.querySelector('.zfzt-cell');
+    if (!cell) return;
+    if (tr.dataset.zfbz === 'Y') {
+      cell.innerHTML = '<span class="tag tag-red">已作废</span>';
+    } else if (tr.dataset.reg === '1') {
+      cell.innerHTML = '<span style="color:#bbb;">正常</span>';
+    } else {
+      cell.innerHTML = '<span style="color:#bbb;">—</span>';
+    }
   }
   function delRow(el, sec) {
     el.closest('tr').remove();
@@ -2767,8 +2924,7 @@
       `<td style="background:#FFFDF5;"><input class="ed-y yz-yyidk" placeholder="自行录入" oninput="recalcYzSum()"></td>` +
       `<td style="color:#bbb;">—</td>` +
       `<td><input value="2026-06-25" readonly></td>` +
-      `<td><select class="ed-y"><option>是</option><option>否</option></select></td>` +
-      `<td style="color:#bbb;">—</td>`;
+      `<td><select class="ed-y"><option>是</option><option>否</option></select></td>`;
     tb.appendChild(tr);
     renumberYz();
     recalcYzSum();
@@ -2814,6 +2970,12 @@
     const remain = orig - others;
     const overflow = remain < -0.005;
     if (remainEl) remainEl.value = fmt(Math.max(remain, 0));
+    // 剩余行的已抵扣税额（用户手录）也计入合计
+    const remainRow = remainEl ? remainEl.closest('tr') : null;
+    if (remainRow) {
+      const remainIdkEl = remainRow.querySelector('.yz-yyidk');
+      if (remainIdkEl) { const rv = ynum(remainIdkEl.value); sumIdk += rv; sumIdkNo += rv; }
+    }
     const total = others + Math.max(remain, 0);
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = fmt(v); };
     set('yz-sum', total); set('yz-sum-se', sumSe); set('yz-sum-idk', sumIdk);
@@ -2828,8 +2990,7 @@
     const bal = document.getElementById('yz-balance');
     const save = document.getElementById('yz-save');
     let ok = true, msg = '';
-    if (!(orig > 0)) { ok = false; msg = '<span style="color:#A8071A;">⚠️ 请先填写资产原值</span>'; }
-    else if (capBad) { ok = false; msg = '<span style="color:#A8071A;">⚠️ 有税控发票「用于此项金额」超过其「凭证金额」，请修正后再保存</span>'; }
+    if (capBad) { ok = false; msg = '<span style="color:#A8071A;">⚠️ 有税控发票「用于此项金额」超过其「凭证金额」，请修正后再保存</span>'; }
     else if (overflow) { ok = false; msg = '<span style="color:#A8071A;">⚠️ 税控发票 + 实际无票的「用于金额」合计已超过资产原值 ' + fmt(orig) + '，请修正</span>'; }
     else { msg = '✅ 用于此项金额合计 = 资产原值 ' + fmt(orig) + '（差额已自动计入「未取得凭证(剩余)」行）'; }
     if (bal) bal.innerHTML = msg;
@@ -3062,7 +3223,7 @@
   }
 
   // ===== 混合用途确认表（第十四条四步法） =====
-  const HO_TZLX = ['1 年度调整', '2 整体处置一次性调整', '3 提前摊销完毕一次性调整'];
+  const HO_TZLX = ['年终混合用途确认', '资产停止使用一次性调整（资产整体处置）', '资产停止使用一次性调整（资产提前摊销完毕）'];
   function hoRowHtml(code) {
     const a = ASSETS[code] || {};
     const opt = HO_TZLX.map(t => `<option>${t}</option>`).join('');
@@ -3195,6 +3356,51 @@
       setHoState('failed');
     }
   }
+  function editHoRow(el) {
+    const tr = el.closest('tr');
+    if (tr.classList.contains('row-void')) return;
+    const editing = tr.classList.toggle('row-editing');
+    tr.querySelectorAll('.in-m6, .in-c7, .in-c9, .in-c10, .in-c11, .in-c12, .in-c13, .in-c14, .in-tzlx').forEach(x => x.disabled = !editing);
+    el.textContent = editing ? '取消编辑' : '编辑';
+  }
+  function toggleVoidHo(el) {
+    const tr = el.closest('tr');
+    if (tr.classList.contains('row-editing')) return;  // 编辑中不可作废
+    const code = tr.dataset.code;
+    const voiding = !tr.classList.contains('row-void');
+    if (voiding) {
+      if (!confirm('确认作废资产 ' + code + ' 的混合用途确认记录？\n（接口16 zfbz1=Y，作废后不可撤回）')) return;
+      toast('接口16已受理，正在作废…');
+      setTimeout(() => {
+        tr.classList.add('row-void');
+        tr.dataset.zfbz = 'Y';
+        // 更新作废状态列
+        const zfztCell = tr.querySelector('.zfzt-cell');
+        if (zfztCell) zfztCell.innerHTML = '<span class="tag tag-red">已作废</span>';
+        // 清空所有业务数值
+        tr.querySelectorAll('.in-m6, .in-c7, .in-c9, .in-c10, .in-c11, .in-c12, .in-c13, .in-c14').forEach(x => { x.value = '0'; x.disabled = true; });
+        tr.querySelectorAll('.in-tzlx').forEach(x => { x.selectedIndex = 0; x.disabled = true; });
+        tr.querySelectorAll('.in-qr').forEach(x => { x.value = '否'; x.disabled = true; });
+        recalcHoRow(tr);
+        // 更新操作按钮
+        el.textContent = '已作废';
+        el.style.color = '#999';
+        el.style.cursor = 'default';
+        el.onclick = null;
+        const editBtn = el.parentElement.querySelector('.mod');
+        if (editBtn) { editBtn.style.display = 'none'; }
+        toast('作废成功（接口13 returncode=00）：' + code);
+      }, 1500);
+    }
+  }
+  // 混合用途确认页：按作废状态筛选行
+  function filterHoZfbz() {
+    const val = document.getElementById('ho-zfbz-filter').value; // '' | 'N' | 'Y'
+    document.querySelectorAll('#ho-tbody tr[data-code]').forEach(tr => {
+      const zfbz = tr.dataset.zfbz || 'N';
+      tr.style.display = (!val || zfbz === val) ? '' : 'none';
+    });
+  }
   function submitHo() {
     if (hoState === 'processing') return;
     const rows = document.querySelectorAll('#ho-tbody tr[data-code]');
@@ -3203,7 +3409,7 @@
     document.getElementById('ho-pclsh').textContent = hoPclsh;
     document.getElementById('ho-time').textContent = new Date().toLocaleString('zh-CN');
     setHoState('processing');
-    hoPollTimer = setTimeout(() => resolveHo('00'), 2500);   // 模拟接口13：2.5s后成功
+    hoPollTimer = setTimeout(() => resolveHo('00'), 2500);
   }
   function refreshHo() { if (hoState === 'processing') resolveHo('00'); }
   function resetHo() {
