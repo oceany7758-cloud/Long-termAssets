@@ -742,7 +742,15 @@
   .row-reg > td { background: #FAFFFB; }
   .row-reg.row-editing > td { background: #FFFBE6; }
   .row-void > td { opacity: .5; text-decoration: line-through; }
-  .row-act { cursor: pointer; margin-left: 5px; font-size: 13px; }
+  .row-processing > td { background: #F5F7FA; }
+  .row-processing .action-link { color: #bbb !important; pointer-events: none; }
+  .row-processing .tag { opacity: .6; }
+  .op-status { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+  .op-status .spin { display: inline-block; width: 12px; height: 12px; border: 2px solid #ddd; border-top-color: #3D7BF4; border-radius: 50%; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .op-status.processing { color: #FA8C16; }
+  .op-status.failed { color: #F5222D; }
+  .op-status.success { color: #52C41A; }  .row-act { cursor: pointer; margin-left: 5px; font-size: 13px; }
   .row-act.mod { color: #3D7BF4; }
   .row-act.void { color: #F5222D; }
   .row-act:hover { opacity: .7; }
@@ -1464,6 +1472,7 @@
           <span style="margin-left:auto;display:flex;gap:8px;">
             <button class="btn btn-default" id="yt-refresh" onclick="refreshResult()">刷新结果</button>
             <button class="btn btn-default" id="yt-reset" onclick="resetYt()" style="display:none;">新建报送</button>
+            <button class="btn btn-default" id="yt-close" onclick="closeYtStatus()" style="display:none;">关闭</button>
           </span>
         </div>
 
@@ -1657,7 +1666,7 @@
             <option>深投置业有限公司</option>
           </select>
           <span style="color:#666;font-size:13px;">所属期(年)</span>
-          <input class="filter-input" type="number" min="2026" value="2026" style="min-width:120px;" id="ho-ssq">
+          <input class="filter-input" type="number" min="2025" value="2026" style="min-width:120px;" id="ho-ssq" onchange="onHoYearChange(this.value)">
           <span class="form-hint">按年确认；每年1月常规确认，或处置达100%/摊销完成时提前确认</span>
           <span style="color:#666;font-size:13px;margin-left:16px;">作废状态</span>
           <select class="filter-select" id="ho-zfbz-filter" onchange="filterHoZfbz()" style="min-width:100px;">
@@ -1678,6 +1687,7 @@
           <span style="margin-left:auto;display:flex;gap:8px;">
             <button class="btn btn-default" id="ho-refresh" onclick="refreshHo()">刷新结果</button>
             <button class="btn btn-default" id="ho-reset" onclick="resetHo()" style="display:none;">新建确认</button>
+            <button class="btn btn-default" id="ho-close" onclick="closeHoStatus()" style="display:none;">关闭</button>
           </span>
         </div>
 
@@ -2196,23 +2206,25 @@
 
 <!-- ============ 弹窗：作废前置校验（不满足4条件） ============ -->
 <div class="modal-mask" id="modal-void-block">
-  <div class="modal" style="width:640px;">
+  <div class="modal" style="width:520px;">
     <div class="modal-header">
-      <div class="modal-title"><i class="info-ico">i</i>提示</div>
+      <div class="modal-title" id="void-title">确认作废</div>
       <div class="modal-close" onclick="closeModal('modal-void-block')">✕</div>
     </div>
-    <div class="modal-body">
-      <p id="void-block-msg" style="font-size:14px; color:#333; line-height:1.8; margin:0;"></p>
-      <table class="void-table" id="void-block-table">
-        <thead>
-          <tr><th>表单名称</th><th>发生期（所属期）</th><th>是否已确认</th></tr>
-        </thead>
-        <tbody id="void-block-tbody"></tbody>
-      </table>
+    <div class="modal-body" style="min-height:80px;">
+      <p id="void-msg" style="font-size:14px; color:#333; line-height:1.8; margin:0 0 12px;"></p>
+      <div id="void-reason-wrap" style="display:none;">
+        <label style="font-size:13px;color:#666;">作废原因 <span style="color:#F5222D;">*</span></label>
+        <textarea id="void-reason" class="form-control" rows="3" maxlength="100" placeholder="请输入作废原因（最多100字）" style="width:100%;margin-top:6px;resize:vertical;"></textarea>
+        <div style="text-align:right;font-size:12px;color:#999;margin-top:4px;"><span id="void-count">0</span>/100</div>
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" onclick="closeModal('modal-void-block')">确定</button>
+      <button class="btn btn-default" onclick="closeModal('modal-void-block')">取消</button>
+      <button class="btn btn-primary" id="void-confirm" onclick="voidConfirm()">确定</button>
     </div>
+  </div>
+</div>
   </div>
 </div>
 
@@ -2242,6 +2254,44 @@
     if (!t) { t = document.createElement('div'); t.id = 'app-toast'; t.className = 'app-toast'; document.body.appendChild(t); }
     t.textContent = msg; t.classList.add('show');
     clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  /* ============ 行操作状态管理 ============ */
+  // data-op: idle(空闲) / registering(登记中) / voiding(作废处理中)
+  function setRowOp(tr, op, msg) {
+    if (!tr) return;
+    tr.setAttribute('data-op', op);
+    const opCell = tr.querySelector('.tz-op') || tr.lastElementChild;
+    if (op === 'idle') {
+      tr.classList.remove('row-processing');
+      return;
+    }
+    tr.classList.add('row-processing');
+    if (opCell) {
+      opCell.innerHTML = '<span class="op-status processing"><span class="spin"></span>' + (msg || '处理中') + '</span>';
+    }
+  }
+  function isRowBusy(tr) {
+    if (!tr) return false;
+    const op = tr.getAttribute('data-op');
+    return op && op !== 'idle';
+  }
+  function checkRowOp(tr, actionName) {
+    if (isRowBusy(tr)) {
+      const op = tr.getAttribute('data-op');
+      const label = op === 'registering' ? '资产登记中' : '作废处理中';
+      toast(label + '，暂不能' + actionName);
+      return false;
+    }
+    return true;
+  }
+  function findTaizhangRow(zcbh) {
+    const rows = document.querySelectorAll('#tbody-taizhang tr');
+    for (const r of rows) {
+      const codeCell = r.querySelector('.cell-primary');
+      if (codeCell && codeCell.textContent.trim() === zcbh) return r;
+    }
+    return null;
   }
 
   // 有效期止 = 调整期起 + 折旧年限 − 1 的月末（YYYY-MM）
@@ -2279,7 +2329,7 @@
       if (t === '查看') { const tr = a.closest('tr'); if (tr && tr.closest('#tbody-taizhang')) return openAssetInfo(tr); return toast('查看（示意）'); }
       if (t === '关联凭证' || t === '重新关联' || t === '查看记录') return openModal('modal-guanlian');
       if (t === '编辑') return toast('编辑台账（示意，接口14 czzt=2修改）');
-      if (t === '作废') { if (confirm('确认作废该资产台账？\n（接口14 czzt=3，需满足“录入≤30天、无用途变更、无混合确认、无查补”4条件）')) toast('已提交作废（示意）'); return; }
+      if (t === '作废') { const _tr = a.closest('tr'); const _zcbh = _tr ? _tr.querySelectorAll('td')[3]?.textContent.trim() : ''; voidAsset(_zcbh); return; }
       if (t === '解除关联') { if (confirm('确认解除该凭证关联？\n（接口5 czlx=02，需带明细UUID）')) toast('已提交解除关联（示意）'); return; }
       return toast('原型示意：' + t);
     }
@@ -2374,6 +2424,8 @@
   }
 
   function gotoGuanlian(zcbh) {
+    const tr = findTaizhangRow(zcbh);
+    if (tr && !checkRowOp(tr, '关联凭证')) return;
     switchPage('page-guanlian', null);
     setTimeout(() => {
       let target = null;
@@ -2417,44 +2469,98 @@
   }
 
   /* ============ 台账作废（接口14 czzt=3 / zfbz1=Y）前置校验 ============ */
-  /* 自行作废须同时满足4条件：录入≤30天、无用途变更(接口11)、无混合确认(接口12)、无查补(接口8)；
-     任一不满足 → 阻断，引导更正申报后再操作 或 去办税服务厅。示例数据模拟各资产的牵制情况。 */
-  const VOID_BLOCK = {
-    // 后续属期存在用途（状态）变更表 → 不允许删除
-    'ZC20260315001': { forms: [{ name: '长期资产用途（状态）变更表', period: '2026-07', confirmed: '--' }] },
-    // 登记已超过30天 → 不允许自行作废
-    'ZC20260610001': { over30: true },
-    // 存在用途变更表 + 混合用途确认表 → 不允许删除
-    'ZC20260501001': { forms: [
-      { name: '长期资产用途（状态）变更表', period: '2026-06', confirmed: '是' },
-      { name: '长期资产混合用途确认表', period: '2026-06', confirmed: '是' }
-    ] }
-  };
+  let voidStep = '', voidZcbh = '';
+  const MOCK_YT = { 'ZC20260315001': true, 'ZC20260501001': true };
+  const MOCK_HO = { 'ZC20260501001': true };
+  const MOCK_CB = {};
+
   function voidAsset(zcbh) {
-    const b = VOID_BLOCK[zcbh];
-    if (b) { showVoidBlock(zcbh, b); return; }
-    // 满足4条件 → 允许企业自行作废
-    const reason = prompt('资产 ' + zcbh + ' 满足作废条件（录入≤30天、无用途变更、无混合确认、无查补）。\n请输入作废原因（zfyy）：');
-    if (reason && reason.trim()) toast('已提交作废（接口14 czzt=3 / zfbz1=Y）：' + zcbh);
-  }
-  function showVoidBlock(zcbh, b) {
-    const msg = document.getElementById('void-block-msg');
-    const table = document.getElementById('void-block-table');
-    const tbody = document.getElementById('void-block-tbody');
-    if (b.over30 && !b.forms) {
-      table.style.display = 'none';
-      tbody.innerHTML = '';
-      msg.textContent = '资产编号为' + zcbh + '的资产，台账登记已超过30天，不允许自行作废。如确需作废，请前往办税服务厅办理。';
-    } else {
-      table.style.display = '';
-      const names = [...new Set(b.forms.map(f => '《' + f.name + '》'))].join('');
-      msg.textContent = '资产编号为' + zcbh + '的资产，后续属期存在' + names +
-        '，不允许删除。如确需删除，请在完成对应属期的更正申报后再操作。';
-      tbody.innerHTML = b.forms.map(f =>
-        '<tr><td>' + f.name + '</td><td>' + f.period + '</td><td>' + f.confirmed + '</td></tr>').join('');
-    }
+    const tr = findTaizhangRow(zcbh);
+    if (tr && !checkRowOp(tr, '作废')) return;
+    voidZcbh = zcbh; voidStep = 'confirm';
+    const a = ASSETS[zcbh] || {};
+    document.getElementById('void-title').textContent = '确认作废';
+    document.getElementById('void-msg').textContent = '确认作废资产「' + (a.name || zcbh) + '」（' + zcbh + '）？作废后不可恢复。';
+    document.getElementById('void-reason-wrap').style.display = 'none';
+    document.getElementById('void-confirm').textContent = '确定';
+    document.getElementById('void-confirm').style.display = '';
+    document.getElementById('void-confirm').disabled = false;
     openModal('modal-void-block');
   }
+
+  function voidConfirm() {
+    if (voidStep === 'confirm') {
+      const a = ASSETS[voidZcbh] || {};
+      const now = new Date('2026-08-04');
+      const reg = a.regDate ? new Date(a.regDate) : now;
+      const days = Math.floor((now - reg) / 86400000);
+      const err = [];
+      if (days > 30) err.push('录入时间超过30天');
+      if (MOCK_YT[voidZcbh]) err.push('存在用途变更明细');
+      if (MOCK_HO[voidZcbh]) err.push('存在混合用途确认明细');
+      if (MOCK_CB[voidZcbh]) err.push('存在查补进项税明细');
+      if (err.length) {
+        voidStep = 'block';
+        document.getElementById('void-title').textContent = '无法作废';
+        document.getElementById('void-msg').textContent = '无法作废，当前资产' + err.join('、') + '。';
+        document.getElementById('void-reason-wrap').style.display = 'none';
+        document.getElementById('void-confirm').style.display = 'none';
+        return;
+      }
+      voidStep = 'reason';
+      document.getElementById('void-title').textContent = '填写作废原因';
+      document.getElementById('void-msg').textContent = '请填写作废原因（必填，最多100字）：';
+      document.getElementById('void-reason-wrap').style.display = '';
+      document.getElementById('void-reason').value = '';
+      document.getElementById('void-count').textContent = '0';
+      document.getElementById('void-confirm').textContent = '确认作废';
+      document.getElementById('void-confirm').style.display = '';
+      document.getElementById('void-confirm').disabled = true;
+      setTimeout(() => document.getElementById('void-reason').focus(), 100);
+    } else if (voidStep === 'reason') {
+      const reason = document.getElementById('void-reason').value.trim();
+      if (!reason) return;
+      closeModal('modal-void-block');
+      // 进入异步处理
+      const zcbh = voidZcbh;
+      const tr = findTaizhangRow(zcbh);
+      if (tr) setRowOp(tr, 'voiding', '作废处理中');
+      // 模拟异步：接口14 czzt=3 → 接口13查登记结果
+      setTimeout(() => {
+        // 模拟：随机80%成功、20%失败（可调整）
+        const success = Math.random() > 0.2;
+        if (success) {
+          if (tr) {
+            tr.classList.add('row-void');
+            tr.style.opacity = '0.55';
+            tr.querySelectorAll('td').forEach(td => td.style.textDecoration = 'line-through');
+            const opCell = tr.querySelector('.tz-op') || tr.lastElementChild;
+            if (opCell) opCell.innerHTML = '<span class="op-status success">✓ 已作废</span>';
+            tr.setAttribute('data-op', 'done');
+            tr.querySelector('input[type=checkbox]')?.setAttribute('disabled', '');
+          }
+          toast('作废成功（接口14 czzt=3 / zfbz1=Y）：' + zcbh);
+        } else {
+          if (tr) {
+            const opCell = tr.querySelector('.tz-op') || tr.lastElementChild;
+            if (opCell) opCell.innerHTML = '<span class="op-status failed">✕ 作废失败</span><br><span style="font-size:11px;color:#999;">税局校验未通过，请重试</span>';
+            tr.setAttribute('data-op', 'idle');
+            tr.classList.remove('row-processing');
+          }
+          toast('作废失败：' + zcbh + ' 税局校验未通过');
+        }
+      }, 2000 + Math.random() * 1000);
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const ta = document.getElementById('void-reason');
+    const cnt = document.getElementById('void-count');
+    const btn = document.getElementById('void-confirm');
+    if (ta) ta.addEventListener('input', function() {
+      cnt.textContent = this.value.length;
+      btn.disabled = !this.value.trim();
+    });
+  });
 
   /* ============ 原值明细弹窗：统一入口（台账原值列）============
      mode='edit'（待补录）：原值/调整期起/资产用途 可编辑 + 凭证金额可编辑
@@ -2489,6 +2595,8 @@
   let currentYzAssociated = false;
   // o = { mode:'edit'|'view', name, alias, zcbh, orig }
   function openYuanzhi(o) {
+    const tr = findTaizhangRow(o.zcbh);
+    if (tr && !checkRowOp(tr, '填写原值')) return;
     if (ASSET_HAS_VOUCHER[o.zcbh] === false) {
       pendingYz = o;
       openModal('modal-associate-tip');
@@ -2598,6 +2706,8 @@
       `<td class="tz-status"><span class="tag tag-orange">登记中</span></td>` +
       `<td class="tz-op"><span style="color:#bbb;">登记中…</span></td>`;
     tb.insertBefore(tr, tb.firstChild);
+    tr.setAttribute('data-op', 'registering');
+    tr.classList.add('row-processing');
     [...tb.querySelectorAll('tr')].forEach((r, i) => r.children[1].textContent = i + 1);
     closeModal('modal-new-asset');
     // 重置弹窗
@@ -2613,6 +2723,8 @@
       ASSET_HAS_VOUCHER[code] = false;   // 新增资产尚未关联凭证 → 进原值弹窗触发软提示、且无税控行
       // 登记成功后自动在发票关联确认表增加一条未关联记录
       addGuanlianRow(company, code, name, type);
+      tr.setAttribute('data-op', 'idle');
+      tr.classList.remove('row-processing');
       const codeCell = tr.querySelector('.tz-code');
       codeCell.textContent = code; codeCell.style.color = '';
       // 原值列变为可点入口（补录模式）
@@ -2630,9 +2742,9 @@
   // 可变更资产（模拟接口11/10返回：台账带出）
   // adj = 调整年限(月)：A不动产240 / B飞机火车轮船120 / C其他60（第十七条）
   const ASSETS = {
-    'ZC20260315001': { name: '成都总部办公楼',   ydk: 450000, months: 6, yz: 5000000, adj: 240, yt: '01 专用于一般计税', yxqq: '2026-03' },
+    'ZC20260315001': { name: '成都总部办公楼',   ydk: 450000, months: 6, yz: 5000000, adj: 240, yt: '01 专用于一般计税', yxqq: '2026-03', regDate: '2026-03-15' },
     'ZC20260320002': { name: '运输货车-川A·88888', ydk: 26000,  months: 4, yz: 200000,  adj: 60,  yt: '02 用于混合用途',   yxqq: '2026-03' },
-    'ZC20260610003': { name: '生产设备-灌装线',   ydk: 78000,  months: 2, yz: 600000,  adj: 60,  yt: '01 专用于一般计税', yxqq: '2026-06' },
+    'ZC20260610003': { name: '生产设备-灌装线',   ydk: 78000,  months: 2, yz: 600000,  adj: 60,  yt: '01 专用于一般计税', yxqq: '2026-06', regDate: '2026-05-10' },
     'ZC20260625004': { name: '加油站罩棚',        ydk: 133000, months: 1, yz: 1400000, adj: 240, yt: '01 专用于一般计税', yxqq: '2026-06' },
   };
 
@@ -2642,7 +2754,9 @@
       '01': [{ code: 'ZC20260320002', after: '03 专用于不允许抵扣项目/非正常损失', uuid: 'BG-7A1F09C2', zfbz: 'N' }],
       '02': [{ code: 'ZC20260315001', bkdk: '30', uuid: 'BG-33E1AB40', zfbz: 'N' }],
     }},
-    '2026-06': { lastFlag: 'Y', data: {} },  // 该期未维护过任何变更，全空
+    '2026-06': { lastFlag: 'Y', data: {
+      '01': [{ code: 'ZC20260315001', after: '02 用于混合用途', uuid: 'BG-DEMO-FAIL', zfbz: 'N' }],
+    }},
     '2026-05': { lastFlag: 'Y', data: {
       '03': [{ code: 'ZC20260610003', uuid: 'BG-5521DDA0', zfbz: 'N' }],
       '04': [{ code: 'ZC20260625004', uuid: 'BG-9F0C7781', zfbz: 'N' }],
@@ -3319,23 +3433,27 @@
       msg = document.getElementById('ho-status-msg'), submit = document.getElementById('ho-submit'),
       reset = document.getElementById('ho-reset'), refresh = document.getElementById('ho-refresh');
     bar.className = 'yt-status ' + (state === 'draft' ? '' : state);
-    if (state === 'draft') { bar.style.display = 'none'; lockHo(false); submit.style.display = ''; submit.disabled = false; submit.textContent = '提交'; return; }
+    if (state === 'draft') { bar.style.display = 'none'; lockHo(false); submit.style.display = ''; submit.disabled = false; submit.textContent = '提交'; document.getElementById('ho-close').style.display = 'none'; return; }
     bar.style.display = 'flex';
     if (state === 'processing') {
       badge.innerHTML = '<span class="yt-spin"></span> 处理中';
       msg.textContent = '接口16已受理，正在轮询接口13查询登记结果…（returncode=10）';
-      lockHo(true); submit.disabled = true; submit.textContent = '报送中…';
+      lockHo(true); submit.disabled = true; submit.textContent = '处理中';
       refresh.style.display = ''; reset.style.display = 'none';
+      document.getElementById('ho-close').style.display = '';
     } else if (state === 'success') {
-      badge.textContent = '✓ 确认成功';
+      badge.textContent = '✓ 处理成功';
       msg.textContent = 'returncode=00，已回写混合用途确认UUID';
       lockHo(false); submit.style.display = ''; submit.disabled = false; submit.textContent = '提交';
       refresh.style.display = 'none'; reset.style.display = '';
     } else if (state === 'failed') {
-      badge.textContent = '✕ 确认失败';
+      badge.textContent = '✕ 处理失败';
       lockHo(false); submit.style.display = ''; submit.disabled = false; submit.textContent = '重新提交';
       refresh.style.display = 'none'; reset.style.display = '';
     }
+  }
+  function closeHoStatus() {
+    document.getElementById('ho-status').style.display = 'none';
   }
   function resolveHo(code, err) {
     clearTimeout(hoPollTimer); hoPollTimer = null;
@@ -3424,6 +3542,33 @@
     }
     setHoState('draft');
   }
+  // 演示数据：2025年自动展示处理中状态
+  function onHoYearChange(year) {
+    if (year === '2025') {
+      // 清空现有数据
+      document.getElementById('ho-tbody').innerHTML = '';
+      // 添加演示数据行：川油能源有限公司 的成都总部办公楼
+      addHoRow('ZC20260315001');
+      const tr = document.querySelector('#ho-tbody tr[data-code]');
+      if (tr) {
+        tr.querySelector('.in-m6').value = '6';
+        tr.querySelector('.in-c7').value = '200000';
+        tr.querySelector('.in-c9').value = '100000';
+        tr.querySelector('.in-c10').value = '0';
+        tr.querySelector('.in-c13').value = '8000000';
+        recalcHoRow(tr);
+      }
+      // 设置处理中状态
+      hoPclsh = 'PC' + Date.now();
+      document.getElementById('ho-pclsh').textContent = hoPclsh;
+      document.getElementById('ho-time').textContent = new Date().toLocaleString('zh-CN');
+      setHoState('processing');
+    } else {
+      // 其他年份恢复默认
+      resetHo();
+    }
+  }
+
   (function initHo() {
     addHoRow('ZC20260320002'); // 运输货车（02混合用途）
     const tr = document.querySelector('#ho-tbody tr[data-code]');
@@ -3505,6 +3650,7 @@
       bar.style.display = 'none';
       lockTables(false);
       submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '提交';
+      document.getElementById('yt-close').style.display = 'none';
       return;
     }
     bar.style.display = 'flex';
@@ -3515,17 +3661,22 @@
       submitBtn.style.display = ''; submitBtn.disabled = true; submitBtn.textContent = '报送中…';
       refreshBtn.style.display = ''; resetBtn.style.display = 'none';
     } else if (state === 'success') {
-      badge.textContent = '✓ 登记成功';
+      badge.textContent = '✓ 处理成功';
       msg.textContent = 'returncode=00，已回写各行变更UUID（后续修改/作废凭此定位）';
       lockTables(false);
       submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '提交';
       refreshBtn.style.display = 'none'; resetBtn.style.display = '';
     } else if (state === 'failed') {
-      badge.textContent = '✕ 登记失败';
+      badge.textContent = '✕ 处理失败';
       lockTables(false);
-      submitBtn.style.display = ''; submitBtn.disabled = false; submitBtn.textContent = '重新报送';
-      refreshBtn.style.display = 'none'; resetBtn.style.display = '';
+      submitBtn.style.display = 'none';
+      refreshBtn.style.display = 'none'; resetBtn.style.display = 'none';
+      document.getElementById('yt-close').style.display = '';
     }
+  }
+
+  function closeYtStatus() {
+    document.getElementById('yt-status').style.display = 'none';
   }
 
   // 模拟接口13返回结果：'00' 成功 / 其它失败
@@ -3591,7 +3742,16 @@
     document.getElementById('yt-period-note').textContent =
       `接口11已加载 ${fsq} 的用途变更表数据　·　最新报告表标志 lastCqzcBgbFlag=${period.lastFlag || 'Y'}` +
       (any ? '　·　✓灰底为已登记行，可修改/作废；勾选空类型可新增' : '　·　该期暂无已报送明细，勾选变更类型即可新增');
-    setYtState('draft');
+    // 演示数据：2026-06 自动展示处理失败状态
+    if (fsq === '2026-06' && any) {
+      ytPclsh = 'PC' + Date.now();
+      document.getElementById('yt-pclsh').textContent = ytPclsh;
+      document.getElementById('yt-time').textContent = new Date().toLocaleString('zh-CN');
+      document.getElementById('yt-status-msg').textContent = 'returncode=99　returnmsg：资产编号ZC20260315001的变动后用途与当前用途相同，请检查后重新报送';
+      setYtState('failed');
+    } else {
+      setYtState('draft');
+    }
   }
 
   // 初始化：默认加载 2026-07
