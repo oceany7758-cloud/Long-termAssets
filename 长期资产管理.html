@@ -742,6 +742,7 @@
   .row-reg > td { background: #FAFFFB; }
   .row-reg.row-editing > td { background: #FFFBE6; }
   .row-void > td { opacity: .5; text-decoration: line-through; }
+  .row-unlink > td { opacity: .5; text-decoration: line-through; background: #fafafa; }
   .row-processing > td { background: #F5F7FA; }
   .row-processing .action-link { color: #bbb !important; pointer-events: none; }
   .row-processing .tag { opacity: .6; }
@@ -921,13 +922,6 @@
               <option>已关联</option>
             </select>
           </div>
-          <div class="qf-item"><label>作废状态</label>
-            <select class="filter-select">
-              <option>全部</option>
-              <option>正常</option>
-              <option>已作废</option>
-            </select>
-          </div>
 
           <div class="qf-item"><label>调整期起</label>
             <div class="month-range">
@@ -992,61 +986,312 @@
                 <th style="width:90px;">登记状态</th>
                 <th style="width:90px;">原值状态</th>
                 <th style="width:110px;">凭证状态</th>
-                <th style="width:80px;">作废状态</th>
                 <th style="width:140px;">处理状态</th>
                 <th style="width:150px;">操作</th>
               </tr>
             </thead>
             <tbody id="tbody-taizhang">
-              <!-- 待补录：新增后仅有基本信息，原值/用途/调整期起未补录 -->
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>1</td>
+                <td>川油能源有限公司</td>
+                <td class="cell-primary">C26150622000000401</td>
+                <td>新建加油设备A</td>
+                <td>新设备A</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-orange">登记中</span></td>
+                <td class="tz-yuanzhi"></td>
+                <td class="tz-pingzheng"></td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'新建加油设备A',alias:'新设备A',zcbh:'C26150622000000401',orig:''})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('C26150622000000401')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('C26150622000000401')">作废</button></div></td>
+              </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>1</td>
+                <td>2</td>
+                <td>蓉信科技有限公司</td>
+                <td class="cell-primary">ZC20260801001</td>
+                <td>成都新办公楼</td>
+                <td>新办公楼</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'成都新办公楼',alias:'新办公楼',zcbh:'ZC20260801001',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260801001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260801001')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>3</td>
+                <td>东莞智造有限公司</td>
+                <td class="cell-primary">C26150622000000402</td>
+                <td>新建产线B</td>
+                <td>产线B</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-orange">登记中</span></td>
+                <td class="tz-yuanzhi"></td>
+                <td class="tz-pingzheng"></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（登记）</span><br><span style="font-size:11px;color:#999;">税局校验未通过</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'新建产线B',alias:'产线B',zcbh:'C26150622000000402',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000402')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000402')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>4</td>
                 <td>川油能源有限公司</td>
                 <td class="cell-primary">C26150622000000257</td>
                 <td>加油站罩棚</td>
                 <td>罩棚</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'加油站罩棚',alias:'罩棚',zcbh:'C26150622000000257',orig:''})">填写原值</span></td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'加油站罩棚',alias:'罩棚',zcbh:'C26150622000000257',orig:''})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000257')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000257')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'加油站罩棚',alias:'罩棚',zcbh:'C26150622000000257',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000257')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000257')">作废</button></div></td>
+              </tr>
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>5</td>
+                <td>深投置业有限公司</td>
+                <td class="cell-primary">ZC20260802001</td>
+                <td>深圳新厂房</td>
+                <td>新厂房</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（编辑原值）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'深圳新厂房',alias:'新厂房',zcbh:'ZC20260802001',orig:''})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('ZC20260802001')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('ZC20260802001')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>2</td>
+                <td>6</td>
+                <td>蓉信科技有限公司</td>
+                <td class="cell-primary">ZC20260320001</td>
+                <td>东莞智能生产线设备</td>
+                <td>产线1号</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>¥8,100,000.00</td>
+                <td>¥729,000.00</td>
+                <td>¥729,000.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-03</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-03-01</td>
+                <td>2031-02-28</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（编辑原值）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'东莞智能生产线设备',alias:'产线1号',zcbh:'ZC20260320001',orig:'8,100,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260320001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260320001')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>7</td>
+                <td>东莞智造有限公司</td>
+                <td class="cell-primary">ZC20260803001</td>
+                <td>东莞新设备C</td>
+                <td>设备C</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（编辑原值）</span><br><span style="font-size:11px;color:#999;">原值金额与发票不符</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞新设备C',alias:'设备C',zcbh:'ZC20260803001',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260803001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260803001')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>8</td>
+                <td>川油能源有限公司</td>
+                <td class="cell-primary">C26150622000000301</td>
+                <td>加油机设备</td>
+                <td>加油机</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'加油机设备',alias:'加油机',zcbh:'C26150622000000301',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000301')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000301')">作废</button></div></td>
+              </tr>
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>9</td>
+                <td>蓉信科技有限公司</td>
+                <td class="cell-primary">ZC20260401002</td>
+                <td>成都研发中心装修</td>
+                <td>研发装修</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'成都研发中心装修',alias:'研发装修',zcbh:'ZC20260401002',orig:''})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('ZC20260401002')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('ZC20260401002')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>10</td>
+                <td>深投置业有限公司</td>
+                <td class="cell-primary">ZC20260804001</td>
+                <td>深圳物流仓库</td>
+                <td>物流仓</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'深圳物流仓库',alias:'物流仓',zcbh:'ZC20260804001',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260804001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260804001')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>11</td>
+                <td>东莞智造有限公司</td>
+                <td class="cell-primary">ZC20260405003</td>
+                <td>东莞厂房钢结构</td>
+                <td>厂房钢构</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（关联凭证）</span><br><span style="font-size:11px;color:#999;">发票号码不存在或已作废</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞厂房钢结构',alias:'厂房钢构',zcbh:'ZC20260405003',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260405003')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260405003')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>12</td>
                 <td>蓉信科技有限公司</td>
                 <td class="cell-primary">ZC20260315001</td>
                 <td>成都总部办公楼</td>
                 <td>总部楼</td>
                 <td>A 不动产</td>
                 <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'成都总部办公楼',alias:'总部楼',zcbh:'ZC20260315001',orig:'8,500,000.00'})">¥8,500,000.00</span></td>
+                <td>¥8,500,000.00</td>
                 <td>¥765,000.00</td>
                 <td>¥765,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-03-01</td>
+                <td>2026-03</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
@@ -1055,64 +1300,50 @@
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'成都总部办公楼',alias:'总部楼',zcbh:'ZC20260315001',orig:'8,500,000.00'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260315001')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260315001')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'成都总部办公楼',alias:'总部楼',zcbh:'ZC20260315001',orig:'8,500,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260315001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260315001')">作废</button></div></td>
               </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>3</td>
-                <td>东莞智造有限公司</td>
-                <td class="cell-primary">ZC20260320001</td>
-                <td>东莞智能生产线设备</td>
-                <td>产线1号</td>
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>13</td>
+                <td>川油能源有限公司</td>
+                <td class="cell-primary">C26150622000000302</td>
+                <td>储油罐</td>
+                <td>油罐</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞智能生产线设备',alias:'产线1号',zcbh:'ZC20260320001',orig:''})">填写原值</span></td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">--</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
-                <td style="color:#bbb;">—</td>
+                <td>¥1,200,000.00</td>
+                <td>¥108,000.00</td>
+                <td>¥108,000.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-05</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-05-01</td>
+                <td>2031-04-30</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞智能生产线设备',alias:'产线1号',zcbh:'ZC20260320001',orig:''})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260320001')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260320001')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'储油罐',alias:'油罐',zcbh:'C26150622000000302',orig:'1,200,000.00'})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('C26150622000000302')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('C26150622000000302')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>4</td>
+                <td>14</td>
                 <td>蓉信科技有限公司</td>
                 <td class="cell-primary">ZC20260610001</td>
                 <td>北京研发基地建筑物</td>
                 <td>研发楼</td>
                 <td>A 不动产</td>
                 <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'北京研发基地建筑物',alias:'研发楼',zcbh:'ZC20260610001',orig:'45,600,000.00'})">¥45,600,000.00</span></td>
+                <td>¥45,600,000.00</td>
                 <td>¥4,104,000.00</td>
                 <td>¥4,104,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-06-01</td>
+                <td>2026-06</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
@@ -1121,31 +1352,24 @@
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'北京研发基地建筑物',alias:'研发楼',zcbh:'ZC20260610001',orig:'45,600,000.00'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260610001')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260610001')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'北京研发基地建筑物',alias:'研发楼',zcbh:'ZC20260610001',orig:'45,600,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260610001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260610001')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>5</td>
+                <td>15</td>
                 <td>深投置业有限公司</td>
                 <td class="cell-primary">ZC20260501001</td>
                 <td>深圳分公司土地使用权</td>
                 <td>深圳地</td>
                 <td>A 不动产、土地使用权</td>
                 <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'深圳分公司土地使用权',alias:'深圳地',zcbh:'ZC20260501001',orig:'25,000,000.00'})">¥25,000,000.00</span></td>
+                <td>¥25,000,000.00</td>
                 <td>¥2,250,000.00</td>
                 <td>¥2,250,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-gray">资本化改造</span></td>
-                <td>2026-05-01</td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-05</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
@@ -1153,29 +1377,22 @@
                 <td>2046-04-30</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'深圳分公司土地使用权',alias:'深圳地',zcbh:'ZC20260501001',orig:'25,000,000.00'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260501001')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260501001')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（关联凭证）</span><br><span style="font-size:11px;color:#999;">追加失败，保留原1张</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'深圳分公司土地使用权',alias:'深圳地',zcbh:'ZC20260501001',orig:'25,000,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260501001')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260501001')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>7</td>
-                <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000301</td>
-                <td>加油机设备</td>
-                <td>加油机</td>
+                <td>16</td>
+                <td>东莞智造有限公司</td>
+                <td class="cell-primary">ZC20260405004</td>
+                <td>东莞生产线自动化</td>
+                <td>自动化线</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'川油能源有限公司',name:'加油机设备',alias:'加油机',zcbh:'C26150622000000301',orig:'680,000.00'})">¥680,000.00</span></td>
-                <td>¥61,200.00</td>
-                <td>¥61,200.00</td>
+                <td>¥7,500,000.00</td>
+                <td>¥675,000.00</td>
+                <td>¥675,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
                 <td>2026-04</td>
@@ -1186,159 +1403,20 @@
                 <td>2031-03-31</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'川油能源有限公司\',name:\'加油机设备\',alias:\'加油机\',zcbh:\'C26150622000000301\',orig:\'680,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000301')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000301')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞生产线自动化',alias:'自动化线',zcbh:'ZC20260405004',orig:'7,500,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260405004')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260405004')">作废</button></div></td>
               </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>8</td>
-                <td>蓉信科技有限公司</td>
-                <td class="cell-primary">ZC20260401002</td>
-                <td>成都研发中心装修</td>
-                <td>研发装修</td>
-                <td>A 不动产</td>
-                <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'成都研发中心装修',alias:'研发装修',zcbh:'ZC20260401002',orig:'3,200,000.00'})">¥3,200,000.00</span></td>
-                <td>¥288,000.00</td>
-                <td>¥288,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-04</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-04-01</td>
-                <td>2046-03-31</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'蓉信科技有限公司\',name:\'成都研发中心装修\',alias:\'研发装修\',zcbh:\'ZC20260401002\',orig:\'3,200,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260401002')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260401002')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>9</td>
-                <td>东莞智造有限公司</td>
-                <td class="cell-primary">ZC20260405003</td>
-                <td>东莞厂房钢结构</td>
-                <td>厂房钢构</td>
-                <td>A 不动产</td>
-                <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'东莞智造有限公司',name:'东莞厂房钢结构',alias:'厂房钢构',zcbh:'ZC20260405003',orig:'18,500,000.00'})">¥18,500,000.00</span></td>
-                <td>¥1,665,000.00</td>
-                <td>¥1,665,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-04</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-04-05</td>
-                <td>2046-03-31</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（4张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'东莞智造有限公司\',name:\'东莞厂房钢结构\',alias:\'厂房钢构\',zcbh:\'ZC20260405003\',orig:\'18,500,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260405003')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260405003')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>10</td>
-                <td>深投置业有限公司</td>
-                <td class="cell-primary">ZC20260410004</td>
-                <td>深圳办公楼装修</td>
-                <td>深办装修</td>
-                <td>A 不动产</td>
-                <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'深圳办公楼装修',alias:'深办装修',zcbh:'ZC20260410004',orig:''})">填写原值</span></td>
-                <td>¥504,000.00</td>
-                <td>¥504,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-04</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-04-10</td>
-                <td>2046-03-31</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'edit\',company:\'深投置业有限公司\',name:\'深圳办公楼装修\',alias:\'深办装修\',zcbh:\'ZC20260410004\',orig:\'\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260410004')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260410004')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>11</td>
-                <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000302</td>
-                <td>储油罐</td>
-                <td>油罐</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'川油能源有限公司',name:'储油罐',alias:'油罐',zcbh:'C26150622000000302',orig:'1,200,000.00'})">¥1,200,000.00</span></td>
-                <td>¥108,000.00</td>
-                <td>¥108,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-05</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-05-01</td>
-                <td>2031-04-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'川油能源有限公司\',name:\'储油罐\',alias:\'油罐\',zcbh:\'C26150622000000302\',orig:\'1,200,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000302')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000302')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>12</td>
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>17</td>
                 <td>蓉信科技有限公司</td>
                 <td class="cell-primary">ZC20260501005</td>
                 <td>服务器机房设备</td>
                 <td>机房设备</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'服务器机房设备',alias:'机房设备',zcbh:'ZC20260501005',orig:'4,800,000.00'})">¥4,800,000.00</span></td>
+                <td>¥4,800,000.00</td>
                 <td>¥432,000.00</td>
                 <td>¥432,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
@@ -1352,125 +1430,149 @@
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'蓉信科技有限公司\',name:\'服务器机房设备\',alias:\'机房设备\',zcbh:\'ZC20260501005\',orig:\'4,800,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260501005')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260501005')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（编辑原值）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'服务器机房设备',alias:'机房设备',zcbh:'ZC20260501005',orig:'4,800,000.00'})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('ZC20260501005')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('ZC20260501005')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>13</td>
-                <td>东莞智造有限公司</td>
-                <td class="cell-primary">ZC20260510006</td>
-                <td>生产线自动化改造</td>
-                <td>自改线</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'东莞智造有限公司',name:'生产线自动化改造',alias:'自改线',zcbh:'ZC20260510006',orig:'7,500,000.00'})">¥7,500,000.00</span></td>
-                <td>¥675,000.00</td>
-                <td>¥675,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-gray">资本化改造</span></td>
-                <td>2026-05</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-05-10</td>
-                <td>2031-04-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'东莞智造有限公司\',name:\'生产线自动化改造\',alias:\'自改线\',zcbh:\'ZC20260510006\',orig:\'7,500,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260510006')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260510006')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>14</td>
-                <td>深投置业有限公司</td>
-                <td class="cell-primary">ZC20260515007</td>
-                <td>深圳停车场土地</td>
-                <td>停车场地</td>
-                <td>A 不动产、土地使用权</td>
-                <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'深圳停车场土地',alias:'停车场地',zcbh:'ZC20260515007',orig:'12,000,000.00'})">¥12,000,000.00</span></td>
-                <td>¥1,080,000.00</td>
-                <td>¥1,080,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-05</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-05-15</td>
-                <td>2046-04-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'深投置业有限公司\',name:\'深圳停车场土地\',alias:\'停车场地\',zcbh:\'ZC20260515007\',orig:\'12,000,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260515007')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260515007')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>15</td>
+                <td>18</td>
                 <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000303</td>
-                <td>油气回收装置</td>
-                <td>回收装</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'油气回收装置',alias:'回收装',zcbh:'C26150622000000303',orig:''})">填写原值</span></td>
-                <td>¥31,500.00</td>
-                <td>¥31,500.00</td>
+                <td class="cell-primary">C26150622000000389</td>
+                <td>输油管道-川渝段</td>
+                <td>川渝管道</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>¥12,800,000.00</td>
+                <td>¥1,152,000.00</td>
+                <td>¥1,152,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-05</td>
+                <td>2026-03</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
                 <td>¥0.00</td>
-                <td>2026-05-20</td>
-                <td>2031-04-30</td>
+                <td>2026-03-01</td>
+                <td>2046-02-28</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'edit\',company:\'川油能源有限公司\',name:\'油气回收装置\',alias:\'回收装\',zcbh:\'C26150622000000303\',orig:\'\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000303')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000303')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（编辑原值）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'输油管道-川渝段',alias:'川渝管道',zcbh:'C26150622000000389',orig:'12,800,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000389')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000389')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>16</td>
+                <td>19</td>
+                <td>深投置业有限公司</td>
+                <td class="cell-primary">ZC20260605009</td>
+                <td>东莞宿舍楼</td>
+                <td>宿舍楼</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>¥9,800,000.00</td>
+                <td>¥882,000.00</td>
+                <td>¥882,000.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-06</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-06-01</td>
+                <td>2046-05-31</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（编辑原值）</span><br><span style="font-size:11px;color:#999;">税局系统异常，请稍后重试</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'东莞宿舍楼',alias:'宿舍楼',zcbh:'ZC20260605009',orig:'9,800,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260605009')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260605009')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>20</td>
+                <td>蓉信科技有限公司</td>
+                <td class="cell-primary">ZC20260701006</td>
+                <td>成都仓库</td>
+                <td>仓库</td>
+                <td>A 不动产</td>
+                <td>240</td>
+                <td>¥12,000,000.00</td>
+                <td>¥1,080,000.00</td>
+                <td>¥1,080,000.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-07</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-07-01</td>
+                <td>2046-06-30</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'成都仓库',alias:'仓库',zcbh:'ZC20260701006',orig:'12,000,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260701006')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260701006')">作废</button></div></td>
+              </tr>
+              <tr class="row-processing">
+                <td><input type="checkbox" disabled></td>
+                <td>21</td>
+                <td>东莞智造有限公司</td>
+                <td class="cell-primary">ZC20260610003</td>
+                <td>生产设备-灌装线</td>
+                <td>灌装线</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>¥600,000.00</td>
+                <td>¥54,000.00</td>
+                <td>¥54,000.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-06</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-06-01</td>
+                <td>2031-05-31</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status processing"><span class="spin"></span>处理中（作废）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'生产设备-灌装线',alias:'灌装线',zcbh:'ZC20260610003',orig:'600,000.00'})">编辑原值</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="gotoGuanlian('ZC20260610003')">关联凭证</button><button class="act-btn disabled" style="pointer-events:none;color:#ccc;" onclick="voidAsset('ZC20260610003')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>22</td>
+                <td>川油能源有限公司</td>
+                <td class="cell-primary">C26150622000000305</td>
+                <td>洗车设备</td>
+                <td>洗车机</td>
+                <td>C 其他长期资产</td>
+                <td>60</td>
+                <td>¥250,000.00</td>
+                <td>¥22,500.00</td>
+                <td>¥22,500.00</td>
+                <td><span class="tag tag-blue">一般计税</span></td>
+                <td><span class="tag tag-green">在用</span></td>
+                <td>2026-07</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
+                <td>2026-07-05</td>
+                <td>2031-06-30</td>
+                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
+                <td class="tz-op"><span class="op-status failed">✕ 处理失败（作废）</span><br><span style="font-size:11px;color:#999;">存在用途变更明细，无法作废</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'洗车设备',alias:'洗车机',zcbh:'C26150622000000305',orig:'250,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000305')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000305')">作废</button></div></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox"></td>
+                <td>23</td>
                 <td>蓉信科技有限公司</td>
                 <td class="cell-primary">ZC20260601008</td>
                 <td>空调系统改造</td>
                 <td>空调改造</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'空调系统改造',alias:'空调改造',zcbh:'ZC20260601008',orig:'2,100,000.00'})">¥2,100,000.00</span></td>
+                <td>¥2,100,000.00</td>
                 <td>¥189,000.00</td>
                 <td>¥189,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
@@ -1484,59 +1586,19 @@
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'蓉信科技有限公司\',name:\'空调系统改造\',alias:\'空调改造\',zcbh:\'ZC20260601008\',orig:\'2,100,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260601008')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260601008')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（关联凭证）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'空调系统改造',alias:'空调改造',zcbh:'ZC20260601008',orig:'2,100,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260601008')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260601008')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>17</td>
-                <td>东莞智造有限公司</td>
-                <td class="cell-primary">ZC20260605009</td>
-                <td>东莞宿舍楼</td>
-                <td>宿舍楼</td>
-                <td>A 不动产</td>
-                <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'东莞智造有限公司',name:'东莞宿舍楼',alias:'宿舍楼',zcbh:'ZC20260605009',orig:'9,800,000.00'})">¥9,800,000.00</span></td>
-                <td>¥882,000.00</td>
-                <td>¥882,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-06</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-06-05</td>
-                <td>2046-05-31</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'东莞智造有限公司\',name:\'东莞宿舍楼\',alias:\'宿舍楼\',zcbh:\'ZC20260605009\',orig:\'9,800,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260605009')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260605009')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>18</td>
+                <td>24</td>
                 <td>深投置业有限公司</td>
                 <td class="cell-primary">ZC20260610010</td>
                 <td>消防系统升级</td>
                 <td>消防升级</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'消防系统升级',alias:'消防升级',zcbh:'ZC20260610010',orig:'1,500,000.00'})">¥1,500,000.00</span></td>
+                <td>¥1,500,000.00</td>
                 <td>¥135,000.00</td>
                 <td>¥135,000.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
@@ -1550,340 +1612,86 @@
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'深投置业有限公司\',name:\'消防系统升级\',alias:\'消防升级\',zcbh:\'ZC20260610010\',orig:\'1,500,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260610010')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260610010')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（编辑原值）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'深投置业有限公司',name:'消防系统升级',alias:'消防升级',zcbh:'ZC20260610010',orig:'1,500,000.00'})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260610010')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260610010')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>19</td>
+                <td>25</td>
                 <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000304</td>
-                <td>便利店货架</td>
-                <td>货架</td>
+                <td class="cell-primary">C26150622000000303</td>
+                <td>油气回收装置</td>
+                <td>回收装</td>
                 <td>C 其他长期资产</td>
                 <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'川油能源有限公司',name:'便利店货架',alias:'货架',zcbh:'C26150622000000304',orig:'120,000.00'})">¥120,000.00</span></td>
-                <td>¥10,800.00</td>
-                <td>¥10,800.00</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-06</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-06-15</td>
-                <td>2031-05-31</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'川油能源有限公司\',name:\'便利店货架\',alias:\'货架\',zcbh:\'C26150622000000304\',orig:\'120,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000304')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000304')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
+                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'川油能源有限公司',name:'油气回收装置',alias:'回收装',zcbh:'C26150622000000303',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('C26150622000000303')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('C26150622000000303')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>20</td>
-                <td>蓉信科技有限公司</td>
-                <td class="cell-primary">ZC20260620011</td>
-                <td>电梯更新工程</td>
-                <td>电梯更新</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'电梯更新工程',alias:'电梯更新',zcbh:'ZC20260620011',orig:'3,600,000.00'})">¥3,600,000.00</span></td>
-                <td>¥324,000.00</td>
-                <td>¥324,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-06</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-06-20</td>
-                <td>2031-05-31</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（5张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'蓉信科技有限公司\',name:\'电梯更新工程\',alias:\'电梯更新\',zcbh:\'ZC20260620011\',orig:\'3,600,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260620011')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260620011')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>21</td>
+                <td>26</td>
                 <td>东莞智造有限公司</td>
                 <td class="cell-primary">ZC20260625012</td>
                 <td>东莞仓库扩建</td>
                 <td>仓库扩建</td>
                 <td>A 不动产</td>
                 <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞仓库扩建',alias:'仓库扩建',zcbh:'ZC20260625012',orig:''})">填写原值</span></td>
-                <td>¥558,000.00</td>
-                <td>¥558,000.00</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-06</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-06-25</td>
-                <td>2046-05-31</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'edit\',company:\'东莞智造有限公司\',name:\'东莞仓库扩建\',alias:\'仓库扩建\',zcbh:\'ZC20260625012\',orig:\'\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260625012')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260625012')">作废</button>
-                  </div>
-                </td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞仓库扩建',alias:'仓库扩建',zcbh:'ZC20260625012',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260625012')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260625012')">作废</button></div></td>
               </tr>
               <tr>
                 <td><input type="checkbox"></td>
-                <td>22</td>
-                <td>深投置业有限公司</td>
-                <td class="cell-primary">ZC20260701013</td>
-                <td>深圳监控系统</td>
-                <td>监控系统</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'深圳监控系统',alias:'监控系统',zcbh:'ZC20260701013',orig:'800,000.00'})">¥800,000.00</span></td>
-                <td>¥72,000.00</td>
-                <td>¥72,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-01</td>
-                <td>2031-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'深投置业有限公司\',name:\'深圳监控系统\',alias:\'监控系统\',zcbh:\'ZC20260701013\',orig:\'800,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260701013')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260701013')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>23</td>
-                <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000305</td>
-                <td>洗车设备</td>
-                <td>洗车机</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'川油能源有限公司',name:'洗车设备',alias:'洗车机',zcbh:'C26150622000000305',orig:'250,000.00'})">¥250,000.00</span></td>
-                <td>¥22,500.00</td>
-                <td>¥22,500.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-05</td>
-                <td>2031-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'川油能源有限公司\',name:\'洗车设备\',alias:\'洗车机\',zcbh:\'C26150622000000305\',orig:\'250,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000305')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000305')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>24</td>
+                <td>27</td>
                 <td>蓉信科技有限公司</td>
-                <td class="cell-primary">ZC20260710014</td>
-                <td>数据中心UPS</td>
-                <td>UPS电源</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'蓉信科技有限公司',name:'数据中心UPS',alias:'UPS电源',zcbh:'ZC20260710014',orig:'1,800,000.00'})">¥1,800,000.00</span></td>
-                <td>¥162,000.00</td>
-                <td>¥162,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-10</td>
-                <td>2031-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（1张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'蓉信科技有限公司\',name:\'数据中心UPS\',alias:\'UPS电源\',zcbh:\'ZC20260710014\',orig:\'1,800,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260710014')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260710014')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>25</td>
-                <td>东莞智造有限公司</td>
                 <td class="cell-primary">ZC20260715015</td>
                 <td>东莞门卫室</td>
                 <td>门卫室</td>
                 <td>A 不动产</td>
                 <td>240</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'edit',company:'东莞智造有限公司',name:'东莞门卫室',alias:'门卫室',zcbh:'ZC20260715015',orig:''})">填写原值</span></td>
-                <td>¥40,500.00</td>
-                <td>¥40,500.00</td>
+                <td>—</td>
+                <td>¥0.00</td>
+                <td>¥0.00</td>
                 <td><span class="tag tag-blue">一般计税</span></td>
                 <td><span class="tag tag-green">在用</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-15</td>
-                <td>2046-06-30</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
                 <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
                 <td class="tz-yuanzhi"><span class="tag tag-orange">待补录</span></td>
                 <td class="tz-pingzheng"><span class="tag tag-red">未关联</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'edit\',company:\'东莞智造有限公司\',name:\'东莞门卫室\',alias:\'门卫室\',zcbh:\'ZC20260715015\',orig:\'\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260715015')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260715015')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>26</td>
-                <td>深投置业有限公司</td>
-                <td class="cell-primary">ZC20260720016</td>
-                <td>深圳绿化工程</td>
-                <td>绿化</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'深投置业有限公司',name:'深圳绿化工程',alias:'绿化',zcbh:'ZC20260720016',orig:'600,000.00'})">¥600,000.00</span></td>
-                <td>¥54,000.00</td>
-                <td>¥54,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">在用</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-20</td>
-                <td>2031-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（3张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'深投置业有限公司\',name:\'深圳绿化工程\',alias:\'绿化\',zcbh:\'ZC20260720016\',orig:\'600,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('ZC20260720016')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('ZC20260720016')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td><input type="checkbox"></td>
-                <td>27</td>
-                <td>川油能源有限公司</td>
-                <td class="cell-primary">C26150622000000306</td>
-                <td>充电桩设备</td>
-                <td>充电桩</td>
-                <td>C 其他长期资产</td>
-                <td>60</td>
-                <td><span class="action-link" onclick="openYuanzhi({mode:'view',company:'川油能源有限公司',name:'充电桩设备',alias:'充电桩',zcbh:'C26150622000000306',orig:'900,000.00'})">¥900,000.00</span></td>
-                <td>¥81,000.00</td>
-                <td>¥81,000.00</td>
-                <td><span class="tag tag-blue">一般计税</span></td>
-                <td><span class="tag tag-green">建设中</span></td>
-                <td>2026-07</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>¥0.00</td>
-                <td>2026-07-25</td>
-                <td>2031-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-green">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-blue">已关联（2张）</span></td>
-                <td class="tz-zuofei"></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions">
-                  <div class="act-btns">
-                    <button class="act-btn primary" onclick="openYuanzhi({mode:\'view\',company:\'川油能源有限公司\',name:\'充电桩设备\',alias:\'充电桩\',zcbh:\'C26150622000000306\',orig:\'900,000.00\'})">编辑原值</button>
-                    <button class="act-btn primary" onclick="gotoGuanlian('C26150622000000306')">关联凭证</button>
-                    <button class="act-btn danger" onclick="voidAsset('C26150622000000306')">作废</button>
-                  </div>
-                </td>
-              </tr>
-              <!-- 已作废示例行 -->
-              <tr class="row-void" style="opacity:.55;">
-                <td><input type="checkbox" disabled></td>
-                <td>6</td>
-                <td>蓉信科技有限公司</td>
-                <td class="cell-primary" style="text-decoration:line-through;">ZC20260701006</td>
-                <td style="text-decoration:line-through;">成都仓库</td>
-                <td style="text-decoration:line-through;">仓库</td>
-                <td style="text-decoration:line-through;">A 不动产</td>
-                <td style="text-decoration:line-through;">240</td>
-                <td style="text-decoration:line-through;">¥12,000,000.00</td>
-                <td style="text-decoration:line-through;">¥1,080,000.00</td>
-                <td style="text-decoration:line-through;">¥1,080,000.00</td>
-                <td><span class="tag tag-blue" style="opacity:.6;">一般计税</span></td>
-                <td><span class="tag tag-green" style="opacity:.6;">在用</span></td>
-                <td style="text-decoration:line-through;">2026-07-01</td>
-                <td style="text-decoration:line-through;">¥0.00</td>
-                <td style="text-decoration:line-through;">¥0.00</td>
-                <td style="text-decoration:line-through;">¥0.00</td>
-                <td style="text-decoration:line-through;">2026-07-01</td>
-                <td style="text-decoration:line-through;">2046-06-30</td>
-                <td class="tz-dengji"><span class="tag tag-gray" style="opacity:.6;">已完成</span></td>
-                <td class="tz-yuanzhi"><span class="tag tag-gray" style="opacity:.6;">已完成</span></td>
-                <td class="tz-pingzheng"><span class="tag tag-gray" style="opacity:.6;">已关联（1张）</span></td>
-                <td class="tz-zuofei"><span class="tag tag-red">已作废</span></td>
-                <td class="tz-op"></td>
-                <td class="tz-actions"><span style="color:#bbb;font-size:12px;">不可操作</span></td>
+                <td class="tz-op"><span class="op-status success">✓ 处理成功（登记）</span></td>
+                <td class="tz-actions"><div class="act-btns"><button class="act-btn primary" onclick="openYuanzhi({mode:'edit',company:'蓉信科技有限公司',name:'东莞门卫室',alias:'门卫室',zcbh:'ZC20260715015',orig:''})">编辑原值</button><button class="act-btn primary" onclick="gotoGuanlian('ZC20260715015')">关联凭证</button><button class="act-btn danger" onclick="voidAsset('ZC20260715015')">作废</button></div></td>
               </tr>
             </tbody>
           </table>
@@ -2291,12 +2099,6 @@
             <label id="lbl-04"><input type="checkbox" id="chk-04" checked onchange="toggleType('04')"> 已全额摊销</label>
           </div>
           <span class="form-hint">勾选变更类型展开对应明细表；提交时勾选项拼为 bglx3="01,02,…"</span>
-          <span style="color:#666;font-size:13px;margin-left:16px;">作废状态</span>
-          <select class="filter-select" id="yt-zfbz-filter" onchange="filterYtZfbz()" style="min-width:100px;">
-            <option value="">全部</option>
-            <option value="N">正常</option>
-            <option value="Y">已作废</option>
-          </select>
         </div>
         <div class="form-hint" id="yt-period-note"></div>
 
@@ -2336,7 +2138,6 @@
                 <th>上次变化时资产净值</th>
                 <th>本次变动时资产净值 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>不得抵扣进项税额（参考）</th>
-                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-01">
@@ -2354,7 +2155,6 @@
               <td class="ro c-scjz">—</td>
               <td class="ro c-bcjz">5,975,000</td>
               <td class="ref-val out-ref">22,500</td>
-              <td class="zfzt-cell"><span class="tag tag-red">已作废</span></td>
             </tr>
           </tbody>
           </table>
@@ -2384,7 +2184,6 @@
                 <th style="min-width:120px;">*处置（不可抵扣情形）比例</th>
                 <th>资产处置比例</th>
                 <th>不得抵扣进项税额（参考）</th>
-                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-02"></tbody>
@@ -2412,7 +2211,6 @@
                 <th>变动时资产净值 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>尚未调整的资产比例 <span style="color:#bbb;font-weight:normal;">自动</span></th>
                 <th>尚未调整的进项税额</th>
-                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-03"></tbody>
@@ -2436,7 +2234,6 @@
                 <th>资产名称</th>
                 <th>有效期起</th>
                 <th>资产已调整月份</th>
-                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="tbody-04"></tbody>
@@ -2505,12 +2302,6 @@
           <span style="color:#666;font-size:13px;">所属期(年)</span>
           <input class="filter-input" type="number" min="2025" value="2026" style="min-width:120px;" id="ho-ssq" onchange="onHoYearChange(this.value)">
           <span class="form-hint">按年确认；每年1月常规确认，或处置达100%/摊销完成时提前确认</span>
-          <span style="color:#666;font-size:13px;margin-left:16px;">作废状态</span>
-          <select class="filter-select" id="ho-zfbz-filter" onchange="filterHoZfbz()" style="min-width:100px;">
-            <option value="">全部</option>
-            <option value="N">正常</option>
-            <option value="Y">已作废</option>
-          </select>
           <div class="filter-actions">
             <button class="btn btn-primary" id="ho-add" onclick="openPicker('ho')">＋ 添加资产</button>
           </div>
@@ -2552,7 +2343,6 @@
                 <th>用于简易/免税/非应税进项税额 ⑯<br><span style="color:#bbb;font-weight:normal;">=(⑧−⑮)×(⑩+⑪+⑫)/(⑬+⑭)</span></th>
                 <th>混用不得抵扣进项税额(参考) ⑰<br><span style="color:#bbb;font-weight:normal;">=⑮+⑯</span></th>
                 <th style="min-width:90px;">*是否已确认 ⑱</th>
-                <th>作废状态</th>
               </tr>
             </thead>
             <tbody id="ho-tbody">
@@ -2578,7 +2368,6 @@
             <td class="ro ref-val out-c16">0.00</td>
             <td class="ref-val out-c17">56,250.00</td>
             <td><select class="ed in-qr" disabled><option selected>是</option></select></td>
-            <td class="zfzt-cell">—</td>
           </tr>
           <tr data-code="ZC20260320002" data-reg="1" data-zfbz="N" class="row-reg">
             <td class="num-col"><span class="row-act mod" onclick="editHoRow(this)">编辑</span> <span class="row-act void" onclick="toggleVoidHo(this)">作废</span></td>
@@ -2601,7 +2390,6 @@
             <td class="ro ref-val out-c16">178.57</td>
             <td class="ref-val out-c17">1,045.24</td>
             <td><select class="ed in-qr" disabled><option selected>是</option></select></td>
-            <td class="zfzt-cell">—</td>
           </tr>
           <!-- 已作废示例行 -->
           <tr data-code="ZC20260701006" data-reg="1" data-zfbz="Y" class="row-reg row-void">
@@ -2625,7 +2413,6 @@
             <td class="ro ref-val out-c16">0.00</td>
             <td class="ref-val out-c17">0.00</td>
             <td><select class="ed in-qr" disabled><option>否</option></select></td>
-            <td class="zfzt-cell"><span class="tag tag-red">已作废</span></td>
           </tr>
         </tbody>
             <tfoot>
@@ -2789,17 +2576,17 @@
           </tr>
         </thead>
         <tbody id="gl-associated-tbody">
-          <tr>
+          <tr data-uuid="a62ade4f-4634">
             <td>01 增值税专用发票</td>
             <td>04412600000123456700</td>
             <td>¥1,000,000.00</td>
             <td><span class="tag tag-green">正常</span></td>
             <td style="font-family:monospace;color:#888;">a62ade4f…4634</td>
-            <td><span class="action-link danger">解除关联</span></td>
+            <td><span class="action-link danger" onclick="toggleUnlink(this)">解除关联</span></td>
           </tr>
         </tbody>
       </table>
-      <div class="form-hint" style="margin-top:6px;">解除关联 = 接口5 czlx=02（需带明细UUID）。</div>
+      <div class="form-hint" style="margin-top:6px;">点击「解除关联」标记灰色，点击「保存关联凭证」统一提交新增和解除。</div>
     </div>
     <div class="modal-footer">
       <span class="form-hint" style="margin-right:auto;">保存后异步受理，凭证关联有同步延迟
@@ -3303,12 +3090,13 @@
       associatedTbody.innerHTML = '';
       vouchers.forEach(v => {
         const tr = document.createElement('tr');
+        tr.setAttribute('data-uuid', v.uuid);
         tr.innerHTML = '<td>' + v.type + '</td>' +
           '<td>' + v.number + '</td>' +
           '<td>¥' + (v.amount || '0.00') + '</td>' +
           '<td><span class="tag tag-' + (v.status === '正常' ? 'green' : 'red') + '">' + v.status + '</span></td>' +
           '<td style="font-family:monospace;color:#888;">' + (v.uuid || '—') + '</td>' +
-          '<td><span class="action-link danger" onclick="removeVoucher(this,\'' + zcbh + '\',\'' + v.uuid + '\')">解除关联</span> <span class=\"action-link\" style=\"color:#FA8C16;margin-left:4px;\" onclick=\"simulateVoucherFail(\'' + zcbh + '\',\'' + v.uuid + '\',\'红冲\')\">模拟失效</span></td>';
+          '<td><span class="action-link danger" onclick="toggleUnlink(this)">解除关联</span> <span class=\"action-link\" style=\"color:#FA8C16;margin-left:4px;\" onclick=\"simulateVoucherFail(\'' + zcbh + '\',\'' + v.uuid + '\',\'红冲\')\">模拟失效</span></td>';
         associatedTbody.appendChild(tr);
       });
     }
@@ -3583,14 +3371,17 @@
   let currentYzAssociated = false;
   // o = { mode:'edit'|'view', name, alias, zcbh, orig }
   function openYuanzhi(o) {
-    const tr = findTaizhangRow(o.zcbh);
-    if (tr && !checkRowOp(tr, '填写原值')) return;
-    if (ASSET_HAS_VOUCHER[o.zcbh] === false) {
-      pendingYz = o;
-      openModal('modal-associate-tip');
-      return;
-    }
-    doOpenYuanzhi(o);
+    console.log('openYuanzhi called', o);
+    try {
+      const tr = findTaizhangRow(o.zcbh);
+      if (tr && !checkRowOp(tr, '填写原值')) return;
+      if (ASSET_HAS_VOUCHER[o.zcbh] === false) {
+        pendingYz = o;
+        openModal('modal-associate-tip');
+        return;
+      }
+      doOpenYuanzhi(o);
+    } catch(e) { console.error('openYuanzhi error:', e); toast('打开原值弹窗失败：' + e.message); }
   }
   function proceedYuanzhi() {   // 暂不关联 → 用06无票继续采集原值
     closeModal('modal-associate-tip');
@@ -3614,6 +3405,7 @@
     recalcYzSum();
   }
   function doOpenYuanzhi(o) {
+    try {
     const locked = (o.mode === 'view');
     document.getElementById('yz-title').textContent = '资产原值明细 - ' + o.name + '(' + o.zcbh + ')';
     // 基本信息头随点击的资产带出，保持前后一致
@@ -3648,6 +3440,7 @@
     document.getElementById('yz-save').textContent = locked ? '保存修改' : '保存并提交';
     fetchBackendSummary(o.zcbh);   // 进弹窗先刷新 ④⑤⑥（接口10/接口8）
     openModal('modal-yuanzhi-detail');
+    } catch(e) { console.error('doOpenYuanzhi error:', e); toast('打开原值弹窗失败：' + e.message); }
   }
 
   const ADJ_MAP = { A: 240, B: 120, C: 60 };
@@ -3680,7 +3473,7 @@
       `<td>${alias || '--'}</td>` +
       `<td>${type}</td>` +
       `<td>${adj}</td>` +
-      `<td class="tz-yz" style="color:#bbb;">填写原值</td>` +
+      `<td class="tz-yz">—</td>` +
       `<td style="color:#bbb;">--</td>` +
       `<td style="color:#bbb;">--</td>` +
       `<td style="color:#bbb;">—</td>` +
@@ -3694,7 +3487,6 @@
       `<td class="tz-dengji"><span class="tag tag-orange">登记中</span></td>` +
       `<td class="tz-yuanzhi"></td>` +
       `<td class="tz-pingzheng"></td>` +
-      `<td class="tz-zuofei"></td>` +
       `<td class="tz-op"></td>` +
       `<td class="tz-actions"></td>`;
     tb.insertBefore(tr, tb.firstChild);
@@ -3721,12 +3513,11 @@
       // 原值列变为可点入口（补录模式）
       const yzCell = tr.querySelector('.tz-yz');
       yzCell.style.color = '';
-      yzCell.innerHTML = '<span class="action-link" onclick="openYuanzhi({mode:\'edit\',company:\'' + company + '\',name:\'' + name + '\',alias:\'' + (alias || '--') + '\',zcbh:\'' + code + '\',orig:\'\'})">填写原值</span>';
+      yzCell.innerHTML = '—';
       // 更新5个状态列
       tr.querySelector('.tz-dengji').innerHTML = '<span class="tag tag-green">已完成</span>';
       tr.querySelector('.tz-yuanzhi').innerHTML = '<span class="tag tag-orange">待补录</span>';
       tr.querySelector('.tz-pingzheng').innerHTML = '<span class="tag tag-red">未关联</span>';
-      tr.querySelector('.tz-zuofei').innerHTML = '';
       setRowOpResult(tr, true, '登记成功');
       // 操作按钮
       tr.querySelector('.tz-actions').innerHTML =
@@ -3817,7 +3608,6 @@
         <td class="ro c-scjz">—</td>
         <td class="ro c-bcjz">—</td>
         <td class="ref-val out-ref">—</td>
-        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     if (sec === '02') {
@@ -3833,7 +3623,6 @@
         <td><input class="ed in-bkdk" value="0" oninput="recalc(this)"></td>
         <td class="ro out-czbl">0.00%</td>
         <td class="ref-val out-ref">—</td>
-        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     if (sec === '03') {
@@ -3846,7 +3635,6 @@
         <td class="ro c-bdjz">—</td>
         <td class="ro c-wtzbl">—</td>
         <td class="ref-val out-ref">—</td>
-        <td class="zfzt-cell">—</td>
       </tr>`;
     }
     // 04 已全额摊销
@@ -3855,7 +3643,6 @@
       <td class="c-name">${a.name || '—'}</td>
       <td class="ro c-yxqq">${a.yxqq || '—'}</td>
       <td class="ro c-months">${a.months ?? '—'}</td>
-      <td class="zfzt-cell">—</td>
     </tr>`;
   }
 
@@ -4192,12 +3979,38 @@
         }
       }
     });
-    if (newVouchers.length === 0) { alert('请至少添加一条关联凭证'); return; }
+    // 收集待解除关联的凭证（标记了 row-unlink 的行）
+    const unlinkedVouchers = [];
+    const associatedTbody = document.getElementById('gl-associated-tbody');
+    if (associatedTbody) {
+      associatedTbody.querySelectorAll('tr.row-unlink').forEach(tr => {
+        const uuid = tr.getAttribute('data-uuid');
+        if (uuid) unlinkedVouchers.push(uuid);
+      });
+    }
+
+    if (newVouchers.length === 0 && unlinkedVouchers.length === 0) {
+      alert('请至少添加一条关联凭证，或标记要解除的凭证');
+      return;
+    }
 
     closeModal('modal-guanlian');
-    alert('已报送凭证关联（接口5 czlx=01关联确认，异步）。\n\n凭证关联需时间同步，可能存在延迟。请稍后重新进入，由接口6查询关联结果（gljg=00 为成功）。\n\n关联成功后，该凭证将自动带入「资产原值明细」。');
-    // 模拟异步查询结果：2.5秒后更新
-    setTimeout(() => {
+
+    // 处理解除关联：从 GL_VOUCHERS 中移除标记的凭证
+    if (unlinkedVouchers.length > 0 && currentGuanlianAsset) {
+      const zcbh = currentGuanlianAsset.zcbh;
+      if (GL_VOUCHERS[zcbh]) {
+        GL_VOUCHERS[zcbh] = GL_VOUCHERS[zcbh].filter(v => !unlinkedVouchers.includes(v.uuid));
+      }
+      updateGuanlianRowStatus(zcbh);
+    }
+
+    const msg = [];
+    if (newVouchers.length > 0) msg.push('新增 ' + newVouchers.length + ' 条关联');
+    if (unlinkedVouchers.length > 0) msg.push('解除 ' + unlinkedVouchers.length + ' 条关联');
+    alert('已报送凭证关联（接口5，异步）：' + msg.join('，') + '。\n\n凭证关联需时间同步，可能存在延迟。请稍后重新进入，由接口6查询关联结果（gljg=00 为成功）。');
+    // 模拟异步查询结果：2.5秒后更新（仅新增关联时）
+    if (newVouchers.length > 0) setTimeout(() => {
       if (!currentGuanlianAsset) return;
       const { company, zcbh, name } = currentGuanlianAsset;
 
@@ -4218,19 +4031,21 @@
     }, 2500);
   }
 
-  // 解除关联（模拟接口5 czlx=02）
+  // 切换解除关联标记（灰色置灰，同用途状态变更作废效果）
+  function toggleUnlink(el) {
+    const tr = el.closest('tr');
+    if (!tr) return;
+    const isUnlinking = !tr.classList.contains('row-unlink');
+    tr.classList.toggle('row-unlink', isUnlinking);
+    el.textContent = isUnlinking ? '取消解除' : '解除关联';
+    el.classList.toggle('primary', isUnlinking);
+    el.classList.toggle('danger', !isUnlinking);
+    toast(isUnlinking ? '已标记解除，点击「保存关联凭证」提交' : '已取消解除');
+  }
+
+  // 保留旧接口兼容（已弃用，改用 toggleUnlink + saveGuanlian 统一提交）
   function removeVoucher(el, zcbh, uuid) {
-    if (!confirm('确认解除该凭证关联？（接口5 czlx=02）')) return;
-    if (GL_VOUCHERS[zcbh]) {
-      GL_VOUCHERS[zcbh] = GL_VOUCHERS[zcbh].filter(v => v.uuid !== uuid);
-    }
-    el.closest('tr').remove();
-    updateGuanlianRowStatus(zcbh);
-    // 更新已关联凭证标题
-    const count = (GL_VOUCHERS[zcbh] || []).length;
-    const title = document.getElementById('gl-associated-title');
-    if (title) title.textContent = '已关联凭证（' + count + '条，接口6查询结果 gljg=00）';
-    toast('已解除关联');
+    toggleUnlink(el);
   }
 
   // 更新发票关联确认表中某资产行的状态和计数
@@ -4492,7 +4307,6 @@
       setTimeout(() => {
         tr.classList.add('row-void');
         tr.dataset.zfbz = 'Y';
-        // 更新作废状态列
         const zfztCell = tr.querySelector('.zfzt-cell');
         if (zfztCell) zfztCell.innerHTML = '<span class="tag tag-red">已作废</span>';
         // 清空所有业务数值
@@ -4510,14 +4324,6 @@
         toast('作废成功（接口13 returncode=00）：' + code);
       }, 1500);
     }
-  }
-  // 混合用途确认页：按作废状态筛选行
-  function filterHoZfbz() {
-    const val = document.getElementById('ho-zfbz-filter').value; // '' | 'N' | 'Y'
-    document.querySelectorAll('#ho-tbody tr[data-code]').forEach(tr => {
-      const zfbz = tr.dataset.zfbz || 'N';
-      tr.style.display = (!val || zfbz === val) ? '' : 'none';
-    });
   }
   function submitHo() {
     if (hoState === 'processing') return;
