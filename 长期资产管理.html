@@ -2567,21 +2567,29 @@
       <table class="inner-table">
         <thead>
           <tr>
+            <th>序号</th>
             <th>凭证类型</th>
             <th>凭证号码</th>
             <th>凭证金额</th>
+            <th>凭证税额</th>
             <th>凭证状态</th>
-            <th>明细UUID</th>
+            <th>开具时间</th>
+            <th>可抵扣税额</th>
+            <th>已抵扣税额</th>
             <th style="width:80px;">操作</th>
           </tr>
         </thead>
         <tbody id="gl-associated-tbody">
           <tr data-uuid="a62ade4f-4634">
+            <td>1</td>
             <td>01 增值税专用发票</td>
             <td>04412600000123456700</td>
             <td>¥1,000,000.00</td>
+            <td>¥90,000.00</td>
             <td><span class="tag tag-green">正常</span></td>
-            <td style="font-family:monospace;color:#888;">a62ade4f…4634</td>
+            <td>2026-03-15</td>
+            <td>¥90,000.00</td>
+            <td>¥0.00</td>
             <td><span class="action-link danger" onclick="toggleUnlink(this)">解除关联</span></td>
           </tr>
         </tbody>
@@ -3064,11 +3072,11 @@
   let currentGuanlianAsset = null; // 当前正在关联的资产信息
   const GL_VOUCHERS = {
     'C26150622000000389': [
-      { type: '01 增值税专用发票', number: '26152000000887712301', amount: '5,000,000.00', status: '正常', uuid: 'MX-A1B2C3D4' },
-      { type: '01 增值税专用发票', number: '26152000000887712302', amount: '4,800,000.00', status: '全额红冲', uuid: 'MX-E5F6G7H8' },
-      { type: '01 增值税专用发票', number: '26152000000887712303', amount: '3,000,000.00', status: '正常', uuid: 'MX-I9J0K1L2' }
+      { type: '01 增值税专用发票', number: '26152000000887712301', amount: '5,000,000.00', tax: '450,000.00', status: '正常', date: '2026-03-15', deductibleTax: '450,000.00', deductedTax: '0.00', uuid: 'MX-A1B2C3D4' },
+      { type: '01 增值税专用发票', number: '26152000000887712302', amount: '4,800,000.00', tax: '432,000.00', status: '全额红冲', date: '2026-04-20', deductibleTax: '0.00', deductedTax: '0.00', uuid: 'MX-E5F6G7H8' },
+      { type: '01 增值税专用发票', number: '26152000000887712303', amount: '3,000,000.00', tax: '270,000.00', status: '正常', date: '2026-05-10', deductibleTax: '270,000.00', deductedTax: '0.00', uuid: 'MX-I9J0K1L2' }
     ]
-  }; // { zcbh: [{ type, number, amount, status, uuid }] } 每资产已关联凭证
+  }; // { zcbh: [{ type, number, amount, tax, status, date, deductibleTax, deductedTax, uuid }] } 每资产已关联凭证
 
   // 打开关联凭证弹窗：根据资产是否已有凭证，动态设置弹窗内容
   function openGuanlianModal(company, zcbh, name) {
@@ -3088,15 +3096,21 @@
     const vouchers = GL_VOUCHERS[zcbh] || [];
     if (associatedTbody) {
       associatedTbody.innerHTML = '';
+      let seq = 0;
       vouchers.forEach(v => {
+        seq++;
         const tr = document.createElement('tr');
         tr.setAttribute('data-uuid', v.uuid);
-        tr.innerHTML = '<td>' + v.type + '</td>' +
+        tr.innerHTML = '<td>' + seq + '</td>' +
+          '<td>' + v.type + '</td>' +
           '<td>' + v.number + '</td>' +
           '<td>¥' + (v.amount || '0.00') + '</td>' +
+          '<td>¥' + (v.tax || '0.00') + '</td>' +
           '<td><span class="tag tag-' + (v.status === '正常' ? 'green' : 'red') + '">' + v.status + '</span></td>' +
-          '<td style="font-family:monospace;color:#888;">' + (v.uuid || '—') + '</td>' +
-          '<td><span class="action-link danger" onclick="toggleUnlink(this)">解除关联</span> <span class=\"action-link\" style=\"color:#FA8C16;margin-left:4px;\" onclick=\"simulateVoucherFail(\'' + zcbh + '\',\'' + v.uuid + '\',\'红冲\')\">模拟失效</span></td>';
+          '<td>' + (v.date || '—') + '</td>' +
+          '<td>¥' + (v.deductibleTax || '0.00') + '</td>' +
+          '<td>¥' + (v.deductedTax || '0.00') + '</td>' +
+          '<td><span class="action-link danger" onclick="toggleUnlink(this)">解除关联</span></td>';
         associatedTbody.appendChild(tr);
       });
     }
@@ -4018,7 +4032,7 @@
       if (!GL_VOUCHERS[zcbh]) GL_VOUCHERS[zcbh] = [];
       newVouchers.forEach(v => {
         const uuid = 'MX-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-        GL_VOUCHERS[zcbh].push({ type: v.type, number: v.number, amount: '0.00', status: '正常', uuid: uuid });
+        GL_VOUCHERS[zcbh].push({ type: v.type, number: v.number, amount: '0.00', tax: '0.00', status: '正常', date: new Date().toISOString().slice(0,10), deductibleTax: '0.00', deductedTax: '0.00', uuid: uuid });
       });
 
       // 更新发票关联确认表状态
