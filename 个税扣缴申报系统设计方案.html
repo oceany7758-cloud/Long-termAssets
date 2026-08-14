@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人所得税扣缴申报系统设计方案 - 乐享智税</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px; color: #333; background: #F5F7FA; line-height: 1.8;
+  }
+  .layout { display: flex; height: 100vh; overflow: hidden; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px; background: #fff; border-right: 1px solid #EBEEF5;
+    display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0;
+  }
+  .sidebar-header {
+    padding: 20px 16px; border-bottom: 1px solid #EBEEF5;
+  }
+  .sidebar-header h1 { font-size: 15px; font-weight: 600; color: #14BFB0; margin-bottom: 4px; }
+  .sidebar-header p { font-size: 12px; color: #999; }
+  .nav-section { padding: 8px 0; }
+  .nav-section-title {
+    font-size: 11px; color: #999; padding: 8px 16px 4px;
+    text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;
+  }
+  .nav-item {
+    display: block; padding: 8px 16px 8px 24px; font-size: 13px; color: #555;
+    text-decoration: none; cursor: pointer; transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { background: #F5F7FA; color: #14BFB0; }
+  .nav-item.active {
+    background: #EAF9F7; color: #14BFB0; border-left-color: #14BFB0; font-weight: 500;
+  }
+  .nav-sub {
+    display: block; padding: 6px 16px 6px 36px; font-size: 12px; color: #888;
+    text-decoration: none; cursor: pointer;
+  }
+  .nav-sub:hover { color: #14BFB0; }
+
+  /* Main */
+  .main { flex: 1; overflow-y: auto; padding: 32px 40px 80px; }
+  .section { max-width: 900px; margin-bottom: 48px; scroll-margin-top: 20px; }
+  .section-title {
+    font-size: 20px; font-weight: 600; color: #1a1a1a; margin-bottom: 6px;
+    padding-bottom: 10px; border-bottom: 2px solid #14BFB0;
+  }
+  .section-subtitle { font-size: 13px; color: #999; margin-bottom: 24px; }
+  .module-title {
+    font-size: 17px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px;
+    padding-left: 12px; border-left: 4px solid #14BFB0; line-height: 1.4;
+  }
+  .module-desc { font-size: 13px; color: #888; margin: 8px 0 16px 16px; }
+
+  /* Table */
+  .api-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 24px; }
+  .api-table th {
+    background: #EAF9F7; color: #0F6E56; font-weight: 500;
+    padding: 10px 12px; text-align: left; border: 1px solid #D1ECE6;
+    white-space: nowrap;
+  }
+  .api-table td {
+    padding: 10px 12px; border: 1px solid #EBEEF5; vertical-align: top;
+  }
+  .api-table tr:nth-child(even) td { background: #FAFCFB; }
+  .api-table .api-name { font-weight: 500; color: #333; white-space: nowrap; }
+  .api-table .code { font-family: "SF Mono", Consolas, monospace; font-size: 12px; color: #C0362C; }
+  .api-table .tag {
+    display: inline-block; padding: 1px 6px; border-radius: 3px;
+    font-size: 11px; font-weight: 500; margin-left: 4px;
+  }
+  .tag-sync { background: #E6F1FB; color: #0C447C; }
+  .tag-async { background: #FAEEDA; color: #633806; }
+
+  /* Cards */
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+  .feature-card {
+    background: #fff; border: 1px solid #EBEEF5; border-radius: 8px;
+    padding: 14px; transition: box-shadow 0.15s;
+  }
+  .feature-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .feature-card h4 { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 4px; }
+  .feature-card p { font-size: 12px; color: #888; line-height: 1.5; }
+  .feature-card .icon { font-size: 18px; margin-bottom: 6px; color: #14BFB0; }
+
+  /* Callout */
+  .callout {
+    background: #FFFBEB; border-left: 3px solid #F6A609;
+    padding: 12px 16px; margin: 16px 0; border-radius: 0 4px 4px 0;
+    font-size: 13px; color: #874D00;
+  }
+  .callout-info {
+    background: #EFF6FF; border-left-color: #3B82F6; color: #1E40AF;
+  }
+  .callout-success {
+    background: #ECFDF5; border-left-color: #10B981; color: #065F46;
+  }
+
+  /* Mermaid */
+  .mermaid {
+    background: #fff; border: 1px solid #EBEEF5; border-radius: 8px;
+    padding: 20px; margin: 16px 0; text-align: center;
+  }
+
+  /* Params */
+  .params-box {
+    background: #1e293b; color: #e2e8f0; border-radius: 8px;
+    padding: 16px; font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px; line-height: 1.6; margin: 12px 0; overflow-x: auto;
+  }
+  .params-box .k { color: #93c5fd; }
+  .params-box .v { color: #fbbf24; }
+  .params-box .c { color: #64748b; }
+
+  /* Phase indicator */
+  .phase-badge {
+    display: inline-block; padding: 2px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 500; margin-bottom: 8px;
+  }
+  .phase-1 { background: #E6F1FB; color: #0C447C; }
+  .phase-2 { background: #EAF3DE; color: #27500A; }
+  .phase-3 { background: #FAEEDA; color: #633806; }
+  .phase-4 { background: #FCEBEB; color: #791F1F; }
+
+  /* Summary */
+  .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .summary-table th {
+    background: #14BFB0; color: #fff; padding: 8px 10px; text-align: left;
+  }
+  .summary-table td {
+    padding: 8px 10px; border-bottom: 1px solid #EBEEF5;
+  }
+  .summary-table tr:hover td { background: #EAF9F7; }
+  .summary-table .num { text-align: center; font-weight: 500; color: #14BFB0; }
+
+  /* Flow steps */
+  .flow-steps { display: flex; gap: 0; margin: 16px 0; flex-wrap: wrap; }
+  .flow-step {
+    flex: 1; min-width: 120px; text-align: center; position: relative;
+    padding: 12px 8px; background: #fff; border: 1px solid #EBEEF5;
+    border-radius: 8px; font-size: 12px;
+  }
+  .flow-step:not(:last-child)::after {
+    content: ''; position: absolute; right: -8px; top: 50%;
+    width: 14px; height: 1px; background: #C0C4CC;
+  }
+  .flow-step .step-num {
+    width: 22px; height: 22px; border-radius: 50%; background: #14BFB0;
+    color: #fff; font-size: 12px; line-height: 22px; margin: 0 auto 6px;
+  }
+  .flow-step .step-title { font-weight: 500; color: #333; margin-bottom: 2px; }
+  .flow-step .step-desc { color: #999; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>个税扣缴申报系统</h1>
+      <p>设计方案 V1.0 · 乐享智税</p>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">系统总览</div>
+      <a class="nav-item" href="#overview">系统概述与架构</a>
+      <a class="nav-item" href="#bizflow">业务流程全景图</a>
+      <a class="nav-item" href="#paradigm">异步交互范式</a>
+      <a class="nav-item" href="#flow">核心业务全链路</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">阶段一 基础数据</div>
+      <a class="nav-item" href="#m1">1. 企业初始化</a>
+      <a class="nav-item" href="#m2">2. 人员信息登记报送</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">阶段二 扣除与算税</div>
+      <a class="nav-item" href="#m3">3. 专项附加扣除管理</a>
+      <a class="nav-item" href="#m4">4. 个人养老金扣除管理</a>
+      <a class="nav-item" href="#m5">5. 算税管理</a>
+      <a class="nav-item" href="#m6">6. 报税管理</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">阶段三 缴款与核对</div>
+      <a class="nav-item" href="#m7">7. 缴款管理</a>
+      <a class="nav-item" href="#m8">8. 漏报检查</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">阶段四 查询与统计</div>
+      <a class="nav-item" href="#m9">9. 查询统计</a>
+      <a class="nav-item" href="#m10">10. 消息查询</a>
+      <a class="nav-item" href="#m11">11. 优惠备案</a>
+      <a class="nav-item" href="#m12">12. 退付手续费核对</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">附录</div>
+      <a class="nav-item" href="#summary">接口清单总表</a>
+      <a class="nav-item" href="#params">参数速查表</a>
+      <a class="nav-item" href="#faq">常见问题 FAQ</a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+<!-- ============================================================ -->
+<!-- 系统概述 -->
+<!-- ============================================================ -->
+<div class="section" id="overview">
+  <div class="section-title">系统概述与架构</div>
+  <div class="section-subtitle">个人所得税扣缴申报系统 · 三层架构 · 12大功能模块</div>
+
+  <div class="callout callout-info">
+    <strong>系统定位：</strong>本系统为扣缴义务人（企业）端个税扣缴申报解决方案，通过乐企平台直连税局征管核心，
+    覆盖从企业注册、人员登记、专项扣除采集、算税、申报、缴款到查询核对的全流程。
+    对接自然人电子税务局（ITS），支持综合所得与分类所得的代扣代缴申报。
+  </div>
+
+  <div class="mermaid">
+flowchart TB
+    classDef biz fill:#E6F1FB,stroke:#378ADD,color:#0C447C
+    classDef gw fill:#FAEEDA,stroke:#BA7517,color:#633806
+    classDef tax fill:#E1F5EE,stroke:#1D9E75,color:#085041
+    classDef cfg fill:#F1EFE8,stroke:#888780,color:#444
+
+    subgraph BIZ["企业业务系统（乐享智税）"]
+      direction LR
+      B1["12大功能模块<br/>扣缴义务人操作侧"]:::biz
+    end
+
+    subgraph GW["乐企平台（税局直连网关）"]
+      direction LR
+      G1["受理报文 → 生成 pclsh<br/>异步转发征管<br/>回落 returncode"]:::gw
+    end
+
+    subgraph TAX["税局征管核心 / 自然人电子税务局(ITS)"]
+      direction LR
+      T1["登记 · 校验 · 算税<br/>申报入库 · 缴款 · 出证"]:::tax
+    end
+
+    CFG["配置中心<br/>nsrsbh 纳税人识别号<br/>djxh 登记序号<br/>sbuuid 申报UUID"]:::cfg
+
+    B1 -->|"Save 提交"| G1
+    G1 -->|"异步落地"| T1
+    T1 -.->|"returncode=00 回落"| G1
+    G1 -.->|"轮询查结果"| B1
+    CFG -.-> B1
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon">[1]</div>
+      <h4>基础数据准备</h4>
+      <p>企业初始化注册、申报密码管理、人员信息登记报送、自然人并档</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">[2]</div>
+      <h4>扣除采集与算税</h4>
+      <p>专项附加扣除接受反馈、个人养老金下载、异步算税、税筹测算</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">[3]</div>
+      <h4>申报与缴款</h4>
+      <p>6类所得申报提交/作废/更正、三方协议与银联缴款、完税证明</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">[4]</div>
+      <h4>核对与查询</h4>
+      <p>漏报漏缴检查、查询统计、消息与异议处理、退付手续费核对</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">[5]</div>
+      <h4>优惠备案</h4>
+      <p>上市公司股权激励递延纳税备案编号查询</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">[6]</div>
+      <h4>退付手续费</h4>
+      <p>查询退付手续费、申请退付、撤销退费申请</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 业务流程全景图 -->
+<!-- ============================================================ -->
+<div class="section" id="bizflow">
+  <div class="section-title">业务流程全景图</div>
+  <div class="section-subtitle">按实际业务阶段划分的代扣代缴全流程，与产品侧流程图对齐</div>
+
+  <div class="mermaid">
+flowchart TD
+    subgraph P0["首次使用"]
+      A[开始] --> B[订购产品<br/>保存企业ID]
+      B --> C[企业注册]
+      C --> D[账号信息上传并校验]
+      D --> E{验证账密}
+      E -->|密码错误| D
+      E -->|密码正确| F[返回账号ID<br/>需保存账号ID]
+    end
+
+    subgraph P1["人员信息<br/>首次需要及有变动"]
+      F --> G[人员信息报送]
+      G --> H[人员信息报送反馈]
+      H --> I[人员报送验证结果]
+      I -->|验证不通过| G
+      I -->|验证通过/验证中/暂不验证| J[报送成功]
+      J --> K[年收入不足6万<br/>扣除名单查询]
+      J --> L[个人养老金<br/>下载接口]
+      J --> M[专项附加扣除查询]
+    end
+
+    subgraph P2["算税"]
+      J -.-> N[异步算税]
+      N --> O[异步算税反馈]
+    end
+
+    subgraph P3["申报"]
+      O --> P[申报数据报送]
+      P --> Q[申报数据报送反馈]
+      Q --> R[查询申报明细数据]
+      R --> S[申报内置算税结果查询]
+      S --> T[申报成功]
+      T --> U{有无税款}
+      U -->|无税款| Z1[结束]
+      U -->|税款大于1元| V[进入缴款]
+      P -.->|作废申报| W[申报作废]
+      W --> W1[申报作废反馈]
+      P -.->|修改数据| X[更正申报]
+      X --> P
+      T -.-> Y[申报状态查询]
+    end
+
+    subgraph P4["缴款"]
+      V --> V1[三方协议缴款]
+      V1 --> V2[三方协议缴款反馈]
+      V --> V3[银联缴款]
+      V3 --> V4[返回链接]
+      V --> V5[打印缴款凭证]
+      V5 --> V6[缴款凭证反馈]
+      V --> V7[缴款状态查询]
+      V7 --> V8[查询企业缴款列表]
+      V --> V9[完税证明开具]
+      V9 --> V10[返回base64数据]
+    end
+
+    style P0 fill:#EAF9F7,stroke:#14BFB0
+    style P1 fill:#F0F7FF,stroke:#3B82F6
+    style P2 fill:#FFFBEB,stroke:#F6A609
+    style P3 fill:#F5F3FF,stroke:#8B5CF6
+    style P4 fill:#ECFDF5,stroke:#10B981
+  </div>
+
+  <div class="callout callout-info">
+    <strong>流程要点：</strong>
+    ① 首次使用必须保存 <span class="code">企业ID</span> 与 <span class="code">账号ID</span>，作为后续所有调用的身份标识；
+    ② 人员信息报送成功后，方可进入算税与申报；
+    ③ 申报成功后先判断<strong>有无税款</strong>，只有<strong>税款 &gt; 1 元</strong>才需要发起缴款；
+    ④ 申报更正需重新走“申报数据报送”链路，申报作废不可恢复，需谨慎。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 异步交互范式 -->
+<!-- ============================================================ -->
+<div class="section" id="paradigm">
+  <div class="section-title">异步交互范式</div>
+  <div class="section-subtitle">所有写入类接口遵循 Save → pclsh → 轮询 的三段式异步范式</div>
+
+  <div class="flow-steps">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <div class="step-title">提交 Save</div>
+      <div class="step-desc">企业系统组装报文，带 nsrsbh/djxh/业务数据，调乐企 Save 接口</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <div class="step-title">受理返 pclsh</div>
+      <div class="step-desc">乐企受理通过后返回 pclsh（批次流水号），标记 returncode=10（处理中）</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <div class="step-title">异步转征管</div>
+      <div class="step-desc">乐企异步将报文转发至税局征管核心，税局落地登记/校验/入库</div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">4</div>
+      <div class="step-title">轮询查结果</div>
+      <div class="step-desc">企业轮询查询接口（带 pclsh），returncode=00 成功，取回税局生成数据</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>同步 vs 异步：</strong>
+    查询类接口（列表查询、信息查询、统计）为<b>同步</b>直接返回；
+    写入类接口（报送、申报、作废、更正、缴款）为<b>异步</b>需轮询。
+    更正/作废操作必须携带原 <span class="code" style="font-family:monospace;color:#C0362C">sbuuid</span> 或对应UUID定位原记录。
+  </div>
+
+  <div class="params-box">
+<span class="c"># 异步交互伪代码</span>
+<span class="k">step1</span>  resp = POST(<span class="v">"/save"</span>, payload={nsrsbh, djxh, ...业务数据})
+        <span class="c"># → 返回 pclsh, returncode=10</span>
+<span class="k">step2</span>  <span class="k">while</span> returncode == <span class="v">"10"</span>:
+          result = POST(<span class="v">"/query"</span>, {pclsh})
+          <span class="c"># → returncode=00 成功 / =20 失败</span>
+          sleep(3s)
+<span class="k">step3</span>  <span class="k">if</span> returncode == <span class="v">"00"</span>:
+          <span class="c"># 取回税局生成的 sbuuid / 人员UUID / 算税结果 等</span>
+          <span class="k">return</span> result.data
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 核心业务全链路 -->
+<!-- ============================================================ -->
+<div class="section" id="flow">
+  <div class="section-title">核心业务全链路时序图</div>
+  <div class="section-subtitle">从企业初始化到缴款出证的完整链路</div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    participant B as 银行
+    Note over X,T: 阶段一 首次使用（一次性）
+    X->>X: 0.1 订购产品，保存企业ID
+    X->>L: 1.1 单位注册(nsrsbh, nsrmc)
+    L-->>X: djxh 登记序号 + zhdh 账号ID
+    X->>L: 1.2 账号信息上传并校验(nsrsbh, djxh, 账号密码)
+    L-->>X: 校验通过，保存账号ID
+    Note over X,T: 阶段二 人员信息（首次及有变动）
+    X->>L: 2.1 人员报送(人员明细 ≤2000/批)
+    L-->>X: pclsh 批次流水号
+    L-)T: 异步落地
+    T--)L: 人员登记, 生成人员UUID
+    loop 轮询
+        X->>L: 2.2 查报送结果(pclsh)
+        L-->>X: returncode=00 + 验证状态
+    end
+    alt 验证不通过
+        X->>X: 修正人员信息
+        X->>L: 重新人员报送
+    else 验证通过/验证中/暂不验证（境外人员）
+        Note right of X: 报送成功
+    end
+    par 扣除采集
+        X->>L: 3.1 接受专项附加扣除反馈(nsrsbh)
+        L-->>X: 员工扣除信息列表
+    and 个人养老金
+        X->>L: 4.1 个人养老金下载(nsrsbh, 期间)
+        L-->>X: 养老金扣除数据
+    and 6万名单
+        X->>L: 2.3 年收入不足6万扣除名单查询(nsrsbh)
+        L-->>X: 可享受一次性扣除6万名单
+    end
+    Note over X,T: 阶段三 算税
+    X->>L: 5.1 异步算税(nsrsbh, 税款所属期)
+    L-->>X: pclsh
+    L-)T: 异步算税
+    T--)L: 算税结果(应纳税额/已缴/应补退)
+    loop 轮询
+        X->>L: 5.2 查算税结果(pclsh)
+        L-->>X: returncode=00 + 算税明细
+    end
+    Note over X,T: 阶段四 申报
+    X->>L: 6.1 申报任务(nsrsbh, 税款所属期)
+    L-->>X: sbuuid 申报UUID
+    X->>L: 6.2 申报数据报送(sbuuid, 申报数据)
+    L-->>X: pclsh
+    L-)T: 异步申报入库
+    T--)L: 申报受理成功
+    loop 轮询
+        X->>L: 6.3 查申报数据报送反馈(pclsh)
+        L-->>X: returncode=00
+    end
+    X->>L: 6.4 查询申报明细数据(sbuuid)
+    L-->>X: 申报明细
+    X->>L: 6.5 申报内置算税结果查询(sbuuid)
+    L-->>X: 算税结果
+    Note right of X: 申报成功
+    alt 无税款或税款 ≤1 元
+        Note right of X: 无需缴款，流程结束
+    else 税款 >1 元
+        Note over X,T: 阶段五 缴款
+        alt 三方协议缴款
+            X->>L: 7.1 三方协议缴款(nsrsbh, sbuuid, yjskse)
+            L-->>X: pclsh
+            L-)T: 扣款
+            T--)L: 缴款成功
+            loop 轮询
+                X->>L: 7.2 缴款状态查询(pclsh)
+                L-->>X: returncode=00 + jkzt
+            end
+        else 银联缴款
+            X->>L: 7.3 银联缴款(nsrsbh, sbuuid, yjskse)
+            L-->>X: payUrl 支付链接
+            X-)B: 跳转银联支付
+        end
+        X->>L: 7.4 打印缴款凭证(jkdh)
+        L-->>X: 缴款凭证
+        X->>L: 7.5 完税证明开具(nsrsbh, 税款所属期)
+        L-->>X: 完税证明(base64/下载链接)
+    end
+    Note over X,T: 阶段六 核对
+    X->>L: 8.1 漏报漏缴检查(nsrsbh, 税款所属期)
+    L-->>X: 检查结果（漏报人员/漏缴税额）
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块1 企业初始化 -->
+<!-- ============================================================ -->
+<div class="section" id="m1">
+  <div class="phase-badge phase-1">阶段一 · 基础数据</div>
+  <div class="module-title">模块1　企业初始化</div>
+  <div class="module-desc">扣缴义务人首次接入个税申报的前置环节，含产品订购、单位注册、账号信息上传校验、申报密码管理、上市公司信息查询；必须保存企业ID与账号ID</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:130px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1.0</td>
+        <td class="api-name">订购产品</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span> 纳税人识别号<br/><span class="code">nsrmc</span> 纳税人名称<br/><span class="code">productCode</span> 产品编码</td>
+        <td><span class="code">qyid</span> 企业ID<br/><span class="code">authInfo</span> 授权信息</td>
+        <td>在企业端完成产品订购，保存 <b>企业ID</b>；该企业ID作为调用个税申报能力的身份标识之一</td>
+      </tr>
+      <tr>
+        <td>1.1</td>
+        <td class="api-name">单位注册</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span> 纳税人识别号<br/><span class="code">nsrmc</span> 纳税人名称<br/><span class="code">swjgDm</span> 税务机关代码</td>
+        <td><span class="code">djxh</span> 登记序号<br/><span class="code">zhdh</span> 账号ID<br/><span class="code">pclsh</span> 批次流水号</td>
+        <td>首次注册扣缴义务人；获取 <b>djxh</b> 作为后续所有接口的前置参数；同一企业只注册一次；返回的账号ID需持久化保存</td>
+      </tr>
+      <tr>
+        <td>1.2</td>
+        <td class="api-name">账号信息上传并校验</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">djxh</span> 登记序号<br/><span class="code">zhdh</span> 账号ID<br/><span class="code">zhmm</span> 账号密码（加密）</td>
+        <td><span class="code">zhid</span> 账号ID<br/><span class="code">jyzt</span> 校验状态</td>
+        <td>将企业个税账号信息上传至乐企并校验；校验通过后保存返回的账号ID；密码错误可重试</td>
+      </tr>
+      <tr>
+        <td>1.3</td>
+        <td class="api-name">申报密码上传</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbsmm</span> 申报密码（加密）</td>
+        <td>受理结果</td>
+        <td>设置用于个税申报的申报密码；密码需加密传输；注册后必须设置密码才能进行申报操作</td>
+      </tr>
+      <tr>
+        <td>1.4</td>
+        <td class="api-name">密码校验</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbsmm</span> 申报密码</td>
+        <td><span class="code">jyzt</span> 校验状态(1通过/0失败)</td>
+        <td>每次申报前校验申报密码；连续校验失败锁定（5次/30分钟）</td>
+      </tr>
+      <tr>
+        <td>1.5</td>
+        <td class="api-name">申报密码修改</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">oldsbsmm</span> 原密码<br/><span class="code">newsbsmm</span> 新密码</td>
+        <td>修改结果</td>
+        <td>需先校验原密码；新密码需符合复杂度要求（8-20位含字母数字）</td>
+      </tr>
+      <tr>
+        <td>1.6</td>
+        <td class="api-name">查询上市公司信息</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">gsmc</span> 公司名称<br/>或 <span class="code">gsdm</span> 公司代码</td>
+        <td><span class="code">ssgsxx</span> 上市公司信息（股票代码、上市交易所等）</td>
+        <td>用于股权激励所得申报时关联上市公司信息；支持模糊查询</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>前置依赖：</strong>模块1是整个系统的入口。<span class="code" style="font-family:monospace;color:#C0362C">djxh</span>（登记序号）
+    是后续所有接口的必备参数。企业完成注册并设置申报密码后，方可进入人员登记和申报流程。
+  </div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    Note right of X: 产品侧完成订购
+    X->>X: 1.0 订购产品，保存企业ID
+    X->>L: 1.1 单位注册(nsrsbh, nsrmc, swjgDm)
+    L-->>X: djxh 登记序号 + zhdh 账号ID
+    X->>L: 1.2 账号信息上传并校验(nsrsbh, djxh, zhdh, 账号密码加密)
+    L-->>X: jyzt=1 校验通过，保存账号ID
+    alt 密码错误
+        L-->>X: jyzt=0 密码错误
+        Note right of X: 修正后重新上传校验
+        X->>L: 重新 1.2 账号信息上传并校验
+    end
+    X->>L: 1.3 申报密码上传(nsrsbh, sbsmm 加密)
+    L-->>X: 受理成功
+    Note right of X: 注册完成, 后续操作前先校验密码
+    X->>L: 1.4 密码校验(nsrsbh, sbsmm)
+    L-->>X: jyzt=1 校验通过
+    Note right of X: 如需修改密码
+    opt 修改密码
+        X->>L: 1.5 修改密码(oldsbsmm, newsbsmm)
+        L-->>X: 修改成功
+    end
+    opt 涉及股权激励
+        X->>L: 1.6 查询上市公司信息(gsmc 公司名称)
+        L-->>X: ssgsxx 上市公司信息列表
+    end
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块2 人员信息登记报送 -->
+<!-- ============================================================ -->
+<div class="section" id="m2">
+  <div class="phase-badge phase-1">阶段一 · 基础数据</div>
+  <div class="module-title">模块2　人员信息登记报送</div>
+  <div class="module-desc">扣缴义务人向税局报送雇员/非雇员人员信息，是算税和申报的前置条件</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2.1</td>
+        <td class="api-name">人员报送</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">ryxxList</span> 人员信息列表（姓名/证件类型/证件号码/国籍/手机号/任职受雇日期等）<br/>每批 ≤2000人</td>
+        <td><span class="code">pclsh</span> 批次流水号</td>
+        <td>支持新增(czzt=1)/修改(czzt=2)/删除(czzt=3)；证件类型含居民身份证/护照/港澳台通行证等；人员信息是算税的前置依赖</td>
+      </tr>
+      <tr>
+        <td>2.2</td>
+        <td class="api-name">验证状态更新/查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">pclsh</span> 或 <span class="code">zjhm</span> 证件号码</td>
+        <td><span class="code">yzzt</span> 验证状态<br/>(1待验证/2验证通过/3验证不通过/4无法验证)</td>
+        <td>查询报送后的人员身份验证状态；验证不通过需修正后重新报送；验证通过才能正常算税申报</td>
+      </tr>
+      <tr>
+        <td>2.3</td>
+        <td class="api-name">人员作废</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">ryuuid</span> 人员UUID<br/><span class="code">zfyy</span> 作废原因</td>
+        <td><span class="code">pclsh</span></td>
+        <td>作废已报送人员；需前置检查该人员无算税/申报记录</td>
+      </tr>
+      <tr>
+        <td>2.4</td>
+        <td class="api-name">人员列表查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">ryzt</span> 人员状态(有效/无效)<br/><span class="code">xm</span> 姓名(模糊)<br/>分页参数</td>
+        <td><span class="code">ryList</span> 人员列表（UUID/姓名/证件/状态/验证状态）</td>
+        <td>支持按状态/姓名/证件号筛选；分页返回</td>
+      </tr>
+      <tr>
+        <td>2.5</td>
+        <td class="api-name">自然人并档服务</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">zjlx</span> 证件类型<br/><span class="code">zjhm</span> 证件号码<br/><span class="code">bdxxList</span> 待并档信息</td>
+        <td><span class="code">bdjg</span> 并档结果<br/><span class="code">zrrbh</span> 自然人编号</td>
+        <td>同一自然人存在多条档案时合并；并档后以统一自然人编号参与算税和汇算</td>
+      </tr>
+      <tr>
+        <td>2.6</td>
+        <td class="api-name">特殊情形处理</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">tsqxDm</span> 特殊情形代码<br/>(非居民/无住所/外籍/高净值等)<br/><span class="code">ryxx</span> 人员扩展信息</td>
+        <td>处理结果</td>
+        <td>非居民个人、无住所个人、外籍高层次人才等特殊身份的附加信息登记与处理</td>
+      </tr>
+      <tr>
+        <td>2.7</td>
+        <td class="api-name">年收入不足6万元扣除名单</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期</td>
+        <td><span class="code">mdList</span> 名单列表（人员/年收入额/是否免预扣）</td>
+        <td>查询符合居民个人年收入≤6万元可免预扣预缴条件的人员名单；名单内人员按累计预扣法免税预扣</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>业务规则：</strong>
+    <ul style="margin:6px 0 0 16px;">
+      <li>人员信息<b>必须先报送并通过验证</b>才能进行算税和申报</li>
+      <li>证件号码为人员唯一标识，修改需走"修改"而非"新增+删除"</li>
+      <li>年收入不足6万名单由税局按上年度数据生成，企业不可自行调整</li>
+      <li>非居民个人不适用累计预扣法，按月代扣代缴</li>
+    </ul>
+  </div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    X->>L: 2.1 人员报送(nsrsbh, ryxxList ≤2000人)
+    L-->>X: pclsh 批次流水号
+    L-)T: 异步人员登记
+    T--)L: 身份验证, 生成 ryuuid
+    loop 轮询 pclsh
+        X->>L: 2.2 查报送结果(pclsh)
+        L-->>X: returncode=00 + yzzt 验证状态
+    end
+    alt 验证不通过
+        X->>X: 修正人员信息
+        X->>L: 2.1 重新报送(czzt=2 修改)
+    else 验证通过
+        Note right of X: 人员可参与算税申报
+    end
+    opt 需作废人员
+        X->>L: 2.3 人员作废(ryuuid, zfyy)
+        L-->>X: pclsh → returncode=00
+    end
+    opt 自然人并档
+        X->>L: 2.5 并档服务(zjlx, zjhm, bdxxList)
+        L-->>X: zrrbh 自然人编号
+    end
+    opt 年初/年中
+        X->>L: 2.7 查年收入不足6万名单(nsrsbh, 税款所属期)
+        L-->>X: 名单列表
+    end
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块3 专项附加扣除管理 -->
+<!-- ============================================================ -->
+<div class="section" id="m3">
+  <div class="phase-badge phase-2">阶段二 · 扣除采集</div>
+  <div class="module-title">模块3　专项附加扣除管理</div>
+  <div class="module-desc">接受员工通过个税APP提交的六项专项附加扣除信息，管理扣除信息与反馈</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>3.1</td>
+        <td class="api-name">专项附加扣除登记报送</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zjlx</span>/<span class="code">zjhm</span> 人员证件<br/><span class="code">zxzkkcList</span> 扣除信息（子女教育/继续教育/大病医疗/住房贷款/住房租金/赡养老人）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>企业代为报送员工专项附加扣除信息（通常员工自行通过APP提交，企业也可代报）；含扣除项目/金额/有效期起止</td>
+      </tr>
+      <tr>
+        <td>3.2</td>
+        <td class="api-name">接受反馈</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期</td>
+        <td><span class="code">fkList</span> 反馈列表（人员/扣除项/反馈状态/校验信息）</td>
+        <td>查询税局对企业代报/员工自报扣除信息的校验反馈；反馈异常需修正后重报</td>
+      </tr>
+      <tr>
+        <td>3.3</td>
+        <td class="api-name">扣除信息查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zjhm</span> 证件号码<br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">kzxx</span> 扣除信息明细（六项各自金额/有效期/享受比例）</td>
+        <td>查询单个人员当期可享受的专项附加扣除明细；用于算税预填</td>
+      </tr>
+      <tr>
+        <td>3.4</td>
+        <td class="api-name">暂停名单查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">ztmdList</span> 暂停名单（人员/暂停项/暂停起止月）</td>
+        <td>查询当期扣除被暂停的人员名单（如员工自行在APP暂停或信息异常）；暂停项在算税时不予扣除</td>
+      </tr>
+      <tr>
+        <td>3.5</td>
+        <td class="api-name">获取企业下所有人扣除金额</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">kchjList</span> 扣除汇总（人员/六项扣除合计/有效月数）</td>
+        <td>批量获取企业当期所有人员专项附加扣除汇总金额；用于批量算税预填和报表</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>六项专项附加扣除：</strong>子女教育（1000元/月/孩）、继续教育（400元/月或3600元/年）、
+    大病医疗（超15000元部分据实，限额80000元/年）、住房贷款利息（1000元/月）、
+    住房租金（800-1500元/月按城市）、赡养老人（2000元/月独生/1000元非独生）。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块4 个人养老金扣除管理 -->
+<!-- ============================================================ -->
+<div class="section" id="m4">
+  <div class="phase-badge phase-2">阶段二 · 扣除采集</div>
+  <div class="module-title">模块4　个人养老金扣除管理</div>
+  <div class="module-desc">下载个人养老金扣除信息，纳入算税扣除项</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>4.1</td>
+        <td class="api-name">个人养老金下载</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期</td>
+        <td><span class="code">yljList</span> 养老金明细（人员/缴存金额/账户信息）</td>
+        <td>下载税局同步的个人养老金扣除数据；限额12000元/年；算税时自动纳入扣除项；养老金数据由社保/银行端同步至税局</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>政策依据：</strong>个人养老金扣除限额为12000元/年，在综合所得或分类所得中据实扣除。
+    数据由个人养老金账户开户银行同步至税局，企业通过此接口下载后参与算税预填。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块5 算税管理 -->
+<!-- ============================================================ -->
+<div class="section" id="m5">
+  <div class="phase-badge phase-2">阶段二 · 算税</div>
+  <div class="module-title">模块5　算税管理</div>
+  <div class="module-desc">个税计算引擎，含异步算税、累计预扣法、全年一次性奖金税筹测算、反算收入等核心计算能力</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:150px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>5.1</td>
+        <td class="api-name">异步算税</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期<br/><span class="code">sfqsjssj</span> 是否清算算税</td>
+        <td><span class="code">pclsh</span></td>
+        <td>批量触发当期所有人员个税计算；按<b>累计预扣法</b>计算综合所得应纳税额；算税完成后可查询应补/退税额</td>
+      </tr>
+      <tr>
+        <td>5.2</td>
+        <td class="api-name">一月多次算税清空数据</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td>清空结果</td>
+        <td>当月多次算税时，先清空上次算税结果再重新算税；避免重复计算导致税额叠加</td>
+      </tr>
+      <tr>
+        <td>5.3</td>
+        <td class="api-name">获取地区信息</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td>无（或 <span class="code">sjDm</span> 省级代码）</td>
+        <td><span class="code">dqList</span> 地区列表（代码/名称/社保基数下限）</td>
+        <td>获取社保缴费地区信息；用于社保公积金扣除和地区差异参数</td>
+      </tr>
+      <tr>
+        <td>5.4</td>
+        <td class="api-name">获取其他单位股权激励信息</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zjhm</span> 人员证件号码<br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">gqjList</span> 股权激励明细（其他单位/激励类型/行权所得）</td>
+        <td>查询该人员在其他单位的股权激励已申报数据；用于避免重复计算和综合所得汇算预填</td>
+      </tr>
+      <tr>
+        <td>5.5</td>
+        <td class="api-name">反算当期收入</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zjhm</span><br/><span class="code">mbse</span> 目标税后金额<br/><span class="code">skssq</span> 税款所属期</td>
+        <td><span class="code">sqse</span> 税前收入<br/><span class="code">ynse</span> 应纳税额</td>
+        <td>给定目标税后收入，反推所需税前收入；用于薪酬倒算场景（如"税后1万需要多少税前"）</td>
+      </tr>
+      <tr>
+        <td>5.6</td>
+        <td class="api-name">获取累计数据</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zjhm</span><br/><span class="code">skssq</span> 税款所属期</td>
+        <td><span class="code">ljsj</span> 累计数据（累计收入/累计扣除/累计已预扣/累计应纳税额）</td>
+        <td>查询人员截至当期的累计预扣数据；累计预扣法的核心数据来源</td>
+      </tr>
+      <tr>
+        <td>5.7</td>
+        <td class="api-name">全年一次性奖金个税计算</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">jjse</span> 奖金金额<br/><span class="code">nsrsbh</span>（用于查税率表）</td>
+        <td><span class="code">ynse</span> 应纳税额<br/><span class="code">sdses</span> 实纳税额<br/><span class="code">sl</span> 税率<br/><span class="code">sskce</span> 速算扣除数</td>
+        <td>全年一次性奖金<b>单独计税</b>计算：奖金÷12 → 查月度税率表 → 奖金×税率−速算扣除数；每个纳税年度每人仅一次</td>
+      </tr>
+      <tr>
+        <td>5.8</td>
+        <td class="api-name">工资年终奖税筹测算</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">gzse</span> 工资薪金<br/><span class="code">jjse</span> 年终奖<br/><span class="code">skssq</span> 税款所属期</td>
+        <td><span class="code">czfa</span> 测算方案列表：<br/>方案A 全部并入综合所得<br/>方案B 年终奖单独计税<br/>方案C 拆分最优<br/>(各方案应纳税额对比)</td>
+        <td>对比不同计税方式的总税负，输出<b>税负最低方案</b>；临界点附近单独计税可能出现"多发少得"，需特殊提示</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-success">
+    <strong>累计预扣法公式：</strong>当期应预扣预缴税额 = (累计预扣预缴应纳税所得额 × 预扣率 − 速算扣除数) − 累计减免税额 − 累计已预扣预缴税额。
+    其中累计预扣预缴应纳税所得额 = 累计收入 − 累计免税收入 − 累计减除费用(5000×月数) − 累计专项扣除 − 累计专项附加扣除 − 累计其他扣除。
+  </div>
+
+  <div class="callout">
+    <strong>年终奖税筹关键：</strong>单独计税时，奖金在<b>临界点</b>（如36000、144000、300000、420000等）附近，
+    多发1元可能导致税额跳档增加数千元。测算时需标注临界点风险，推荐拆分到临界点以下或并入综合所得。
+  </div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    Note over X,T: 前置：人员已报送+验证通过、扣除信息已采集
+    opt 当月已算过税需重算
+        X->>L: 5.2 清空算税数据(nsrsbh, 税款所属期)
+        L-->>X: 清空成功
+    end
+    X->>L: 5.1 异步算税(nsrsbh, 税款所属期)
+    L-->>X: pclsh
+    L-)T: 异步执行累计预扣法计算
+    T--)L: 每人应纳税额/累计已预扣/应补退
+    loop 轮询
+        X->>L: 查算税结果(pclsh)
+        L-->>X: returncode=00 + 算税明细
+    end
+    Note right of X: 算税完成, 可进入申报提交
+    opt 年终奖单独计税
+        X->>L: 5.7 全年一次性奖金计算(jjse 奖金)
+        L-->>X: ynse 应纳税额
+    end
+    opt 税筹测算
+        X->>L: 5.8 工资年终奖税筹(gzse, jjse)
+        L-->>X: czfa 最优方案(方案A/B/C税额对比)
+    end
+    opt 薪酬倒算
+        X->>L: 5.5 反算当期收入(mbse 目标税后)
+        L-->>X: sqse 税前收入
+    end
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块6 报税管理 -->
+<!-- ============================================================ -->
+<div class="section" id="m6">
+  <div class="phase-badge phase-2">阶段二 · 申报</div>
+  <div class="module-title">模块6　报税管理</div>
+  <div class="module-desc">代扣代缴申报核心模块，支持申报任务、数据报送、明细查询、内置算税结果查询、6类所得申报、作废、更正、撤销更正</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:150px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>6.1</td>
+        <td class="api-name">申报任务</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期<br/><span class="code">sblx</span> 申报类型</td>
+        <td><span class="code">sbuuid</span> 申报UUID<br/><span class="code">sbzt</span> 申报状态</td>
+        <td>创建/查询当期申报任务；获取 sbuuid 作为申报提交的载体；检查当期是否已申报</td>
+      </tr>
+      <tr>
+        <td>6.2</td>
+        <td class="api-name">申报数据报送</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span> 申报UUID<br/><span class="code">sbData</span> 申报数据（所得项+人员明细+税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>提交完整申报数据至税局；需前置完成算税；申报数据含各所得项明细表；受理后通过 pclsh 轮询结果</td>
+      </tr>
+      <tr>
+        <td>6.3</td>
+        <td class="api-name">查询申报明细数据</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span> 申报UUID</td>
+        <td><span class="code">sbmxList</span> 申报明细列表（人员/所得项/收入/扣除/税额）</td>
+        <td>申报数据报送成功后，查询本次申报的明细数据，用于企业对账和展示</td>
+      </tr>
+      <tr>
+        <td>6.4</td>
+        <td class="api-name">申报内置算税结果查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span> 申报UUID</td>
+        <td><span class="code">ssjsList</span> 算税结果列表（人员/应纳税额/应补退税额）</td>
+        <td>查询税局端根据申报数据计算的税额结果；与本地算税结果比对，发现差异时提示用户核对</td>
+      </tr>
+      <tr>
+        <td>6.5</td>
+        <td class="api-name">申报作废</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">zfyy</span> 作废原因</td>
+        <td><span class="code">pclsh</span></td>
+        <td>作废当期申报；前置条件：已申报未缴款或缴款失败；作废后可重新申报</td>
+      </tr>
+      <tr>
+        <td>6.6</td>
+        <td class="api-name">更正申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span> 原申报UUID<br/><span class="code">gzsbData</span> 更正后数据</td>
+        <td><span class="code">pclsh</span><br/><span class="code">gzsbuuid</span> 更正申报UUID</td>
+        <td>对已申报数据发起更正；需带原 sbuuid 定位；更正后生成新更正记录；已缴款的更正可能产生补退</td>
+      </tr>
+      <tr>
+        <td>6.7</td>
+        <td class="api-name">撤销更正</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">gzsbuuid</span> 更正申报UUID</td>
+        <td><span class="code">pclsh</span></td>
+        <td>撤销已发起的更正，恢复原申报状态；前置条件：更正未产生新的缴款</td>
+      </tr>
+      <tr>
+        <td>6.8</td>
+        <td class="api-name">正常工资薪金申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">gzxmList</span> 工资明细（人员/收入额/各项扣除/税率/应纳税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>工资薪金所得代扣代缴申报；按累计预扣法计算；最核心的申报项目</td>
+      </tr>
+      <tr>
+        <td>6.9</td>
+        <td class="api-name">全年一次性奖金申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">jjxmList</span> 奖金明细（人员/奖金额/税率/应纳税额/计税方式）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>全年一次性奖金单独计税申报；每人每年仅一次；含计税方式选择（单独/并入综合）</td>
+      </tr>
+      <tr>
+        <td>6.10</td>
+        <td class="api-name">解除劳动合同一次性补偿金申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">bcxmList</span> 补偿明细（人员/补偿额/在本企业工作年限/免税额/应纳税所得额/税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>解除劳动关系一次性补偿金；免税额=当地上年平均工资×3倍；超部分÷工作年限(≤12)查综合税率表</td>
+      </tr>
+      <tr>
+        <td>6.11</td>
+        <td class="api-name">个人股权激励收入申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">gqjxmList</span> 股权激励明细（人员/激励类型/行权价/公允价/数量/所得额/税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>股权激励所得申报；需关联上市公司信息(接口1.5)；含限制性股票/股票期权/股权奖励等类型</td>
+      </tr>
+      <tr>
+        <td>6.12</td>
+        <td class="api-name">一般劳务报酬所得申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">lwxmList</span> 劳务明细（人员/收入额/20%费用扣除/准予扣除的税费/应纳税所得额/税率20%-40%/预扣税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>劳务报酬所得预扣预缴申报；每次≤4000减800、>4000减20%；三级超额累进20%/30%/40%</td>
+      </tr>
+      <tr>
+        <td>6.13</td>
+        <td class="api-name">其他偶然所得申报</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">orxmList</span> 偶然所得明细（人员/所得额/税率20%/应纳税额）</td>
+        <td><span class="code">pclsh</span></td>
+        <td>偶然所得全额计税，税率20%；含中奖/赠与等；无费用扣除</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>申报前置条件链：</strong>企业注册(1.1) → 账号校验(1.2) → 人员报送(2.1) → 扣除采集(3.x/4.1) → 异步算税(5.1) → 申报数据报送(6.2) → 查询明细/算税结果(6.3/6.4)。
+    <br/>
+    <strong>申报成功后的税款判断：</strong>申报成功后必须查询算税结果并判断<strong>有无税款</strong>；只有<strong>税款 &gt; 1 元</strong>时才需要进入缴款流程，否则流程结束。
+    <br/>
+    申报作废/更正需带原 sbuuid；更正撤销需带更正UUID。
+  </div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    X->>L: 6.1 申报任务(nsrsbh, 税款所属期, 申报类型)
+    L-->>X: sbuuid 申报UUID
+    Note right of X: 组装申报数据(算税结果+各所得项明细)
+    X->>L: 6.2 申报数据报送(sbuuid, 申报数据)
+    L-->>X: pclsh
+    L-)T: 异步申报入库
+    T--)L: 申报受理
+    loop 轮询
+        X->>L: 查申报数据报送反馈(pclsh)
+        L-->>X: returncode=00
+    end
+    Note right of X: 申报成功
+    X->>L: 6.3 查询申报明细数据(sbuuid)
+    L-->>X: sbmxList 申报明细
+    X->>L: 6.4 申报内置算税结果查询(sbuuid)
+    L-->>X: ssjsList 算税结果
+    alt 无税款或税款 ≤1 元
+        Note right of X: 无需缴款，流程结束
+    else 税款 >1 元
+        Note over X,T: 进入缴款(模块7)
+    end
+    opt 需更正
+        X->>L: 6.6 更正申报(sbuuid 原UUID, 更正数据)
+        L-->>X: pclsh + gzsbuuid 更正UUID
+        loop 轮询
+            X->>L: 查更正结果(pclsh)
+            L-->>X: returncode=00
+        end
+        opt 撤销更正
+            X->>L: 6.7 撤销更正(gzsbuuid)
+            L-->>X: pclsh → returncode=00
+        end
+    end
+    opt 需作废
+        X->>L: 6.5 申报作废(sbuuid, zfyy)
+        L-->>X: pclsh → returncode=00
+    end
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块7 缴款管理 -->
+<!-- ============================================================ -->
+<div class="section" id="m7">
+  <div class="phase-badge phase-3">阶段三 · 缴款</div>
+  <div class="module-title">模块7　缴款管理</div>
+  <div class="module-desc">申报成功且税款 &gt;1 元后的税款缴纳，支持三方协议扣款、银联缴款、缴款状态查询、缴款凭证打印、完税证明开具</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>7.1</td>
+        <td class="api-name">三方协议缴款</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span> 申报UUID<br/><span class="code">yjskse</span> 应缴税额<br/><span class="code">sfxyh</span> 三方协议号</td>
+        <td><span class="code">pclsh</span><br/><span class="code">jkzt</span> 缴款状态</td>
+        <td>通过企业-银行-税局三方协议自动扣款；需企业已签订三方协议；扣款失败需重试或改走银联</td>
+      </tr>
+      <tr>
+        <td>7.2</td>
+        <td class="api-name">缴款状态查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">pclsh</span> 批次流水号<br/>或 <span class="code">jkdh</span> 缴款单号</td>
+        <td><span class="code">jkzt</span> 缴款状态<br/><span class="code">jkList</span> 企业缴款列表</td>
+        <td>查询三方协议扣款结果或企业历史缴款记录；缴款异步处理时需轮询此接口</td>
+      </tr>
+      <tr>
+        <td>7.3</td>
+        <td class="api-name">打印缴款凭证</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">jkdh</span> 缴款单号<br/>或 <span class="code">sbuuid</span> 申报UUID</td>
+        <td><span class="code">jkpzUrl</span> 缴款凭证下载链接<br/><span class="code">jkpzBase64</span> 凭证base64数据</td>
+        <td>缴款成功后打印缴款凭证；返回电子凭证下载链接或 base64 数据，用于企业归档</td>
+      </tr>
+      <tr>
+        <td>7.4</td>
+        <td class="api-name">银联缴款</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">sbuuid</span><br/><span class="code">yjskse</span> 应缴税额</td>
+        <td><span class="code">payUrl</span> 银联支付链接<br/><span class="code">jkdh</span> 缴款单号</td>
+        <td>生成银联在线支付链接；用户跳转银联页面完成缴款；适合无三方协议或三方扣款失败场景</td>
+      </tr>
+      <tr>
+        <td>7.5</td>
+        <td class="api-name">完税证明开具</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期<br/>或 <span class="code">jkdh</span> 缴款单号</td>
+        <td><span class="code">wszmUrl</span> 完税证明下载链接<br/><span class="code">wszmBase64</span> 完税证明base64数据</td>
+        <td>缴款成功后开具完税证明；可按税款所属期或缴款单号查询开具；返回下载链接或 base64 数据</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>缴款触发条件：</strong>只有申报成功后算税结果中<strong>应缴税额 &gt; 1 元</strong>时才需要发起缴款；
+    无税款或税额 ≤1 元时无需缴款，流程直接结束。
+    <br/>
+    <strong>缴款路径：</strong>优先走三方协议自动扣款（7.1）；扣款失败或无三方协议时改走银联缴款（7.4）。
+  </div>
+
+  <div class="mermaid">
+sequenceDiagram
+    autonumber
+    participant X as 乐享智税
+    participant L as 乐企平台
+    participant T as 税局征管/ITS
+    participant B as 银行
+    Note over X,T: 前置：申报成功且税款 &gt;1 元
+    alt 三方协议缴款
+        X->>L: 7.1 三方协议缴款(nsrsbh, sbuuid, yjskse, sfxyh)
+        L-->>X: pclsh
+        L-)T: 发起三方扣款指令
+        T-)B: 扣款请求
+        B--)T: 扣款成功/失败
+        T--)L: jkzt 缴款状态
+        loop 轮询
+            X->>L: 7.2 缴款状态查询(pclsh)
+            L-->>X: returncode=00 + jkzt
+        end
+        X->>L: 7.3 打印缴款凭证(jkdh)
+        L-->>X: jkpzBase64 缴款凭证
+    else 银联缴款
+        X->>L: 7.4 银联缴款(nsrsbh, sbuuid, yjskse)
+        L-->>X: payUrl 银联支付链接 + jkdh
+        X-)B: 跳转银联页面支付
+        B--)T: 缴款到账
+        Note right of X: 银联到账后通过 7.2 查询确认
+    end
+    X->>L: 7.5 完税证明开具(nsrsbh, 税款所属期)
+    L-->>X: wszmBase64 完税证明
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块8 漏报检查 -->
+<!-- ============================================================ -->
+<div class="section" id="m8">
+  <div class="phase-badge phase-3">阶段三 · 核对</div>
+  <div class="module-title">模块8　漏报检查</div>
+  <div class="module-desc">代扣代缴漏报漏缴检查，比对已申报与实际应报数据</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>8.1</td>
+        <td class="api-name">代扣代缴漏报漏缴检查</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span> 税款所属期</td>
+        <td><span class="code">jcjg</span> 检查结果：<br/><span class="code">lbList</span> 漏报人员名单<br/><span class="code">ljList</span> 漏缴税额明细<br/><span class="code">cyList</span> 差异明细</td>
+        <td>比对企业已申报人员与实际发放工资人员，检查是否有漏报漏缴；检查范围为当期或累计；发现漏报需更正申报</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>检查逻辑：</strong>税局比对企业报送的人员信息（模块2）、算税结果（模块5）与申报数据（模块6），
+    识别以下风险：
+    <ul style="margin:6px 0 0 16px;">
+      <li><b>漏报人员</b>：有工资发放记录但未在申报明细中</li>
+      <li><b>漏缴税额</b>：申报税额小于按规定应扣缴税额</li>
+      <li><b>多缴退回</b>：申报税额大于应扣缴（可申请退付）</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块9 查询统计 -->
+<!-- ============================================================ -->
+<div class="section" id="m9">
+  <div class="phase-badge phase-4">阶段四 · 查询</div>
+  <div class="module-title">模块9　查询统计</div>
+  <div class="module-desc">多维度查询个税扣缴明细、申报记录、缴款记录、汇算状态等</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:160px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>9.1</td>
+        <td class="api-name">个人扣缴明细查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">zjhm</span> 证件号码<br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">kjmxList</span> 扣缴明细（期间/所得项/收入额/扣除/税额）</td>
+        <td>查询单个人员的个税扣缴明细记录；支持跨期查询；用于员工查询和个人所得税证明</td>
+      </tr>
+      <tr>
+        <td>9.2</td>
+        <td class="api-name">单位申报记录查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span><br/><span class="code">sblx</span> 申报类型</td>
+        <td><span class="code">sbList</span> 申报记录（sbuuid/类型/状态/申报日期/应纳税额/缴款状态）</td>
+        <td>查询企业当期/历史申报记录列表；含正常申报、更正记录；支持按申报类型筛选</td>
+      </tr>
+      <tr>
+        <td>9.3</td>
+        <td class="api-name">缴款记录查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">jkList</span> 缴款记录（缴款单号/金额/方式/状态/日期）</td>
+        <td>查询历史缴款记录；含三方协议/银联；含缴款状态（成功/失败/处理中）</td>
+      </tr>
+      <tr>
+        <td>9.4</td>
+        <td class="api-name">员工汇算申报状态查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssq</span> 所属年度</td>
+        <td><span class="code">hsList</span> 汇算状态（人员/汇算状态：未开始/已申报/已退/已补/豁免）</td>
+        <td>查询企业员工年度综合所得汇算清缴状态；用于企业跟进员工汇算进度</td>
+      </tr>
+      <tr>
+        <td>9.5</td>
+        <td class="api-name">员工未注册个税APP查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">ryList</span> 人员列表（或全量）</td>
+        <td><span class="code">wzcList</span> 未注册名单（人员/注册状态）</td>
+        <td>查询尚未注册个税APP的员工；未注册影响员工自行汇算和扣除信息提交</td>
+      </tr>
+      <tr>
+        <td>9.6</td>
+        <td class="api-name">个人代开发票明细查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">zjhm</span> 证件号码<br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">fpList</span> 代开发票明细（发票号/金额/税目/税额/代开税务机关）</td>
+        <td>查询个人在税局代开的发票记录；用于核实劳务报酬等所得的真实性和已扣缴情况</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块10 消息查询 -->
+<!-- ============================================================ -->
+<div class="section" id="m10">
+  <div class="phase-badge phase-4">阶段四 · 消息</div>
+  <div class="module-title">模块10　消息查询</div>
+  <div class="module-desc">税局消息、异议申诉、通知提醒、线上征询的查询与回复</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:160px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>10.1</td>
+        <td class="api-name">消息查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">xxlx</span> 消息类型<br/><span class="code">skssqq</span>/<span class="code">skssqz</span></td>
+        <td><span class="code">xxList</span> 消息列表（消息ID/类型/内容/时间/已读状态）</td>
+        <td>查询税局下发的各类消息（催报/催缴/风险提示/政策通知等）</td>
+      </tr>
+      <tr>
+        <td>10.2</td>
+        <td class="api-name">查询异议申诉属实记录人员</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssq</span> 所属年度</td>
+        <td><span class="code">ysList</span> 异议属实名单（人员/申诉内容/属实认定结果）</td>
+        <td>查询被员工提出异议申诉且税局核实属实的记录；属实记录可能需企业更正申报</td>
+      </tr>
+      <tr>
+        <td>10.3</td>
+        <td class="api-name">通知提醒消息查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">tzlx</span> 通知类型</td>
+        <td><span class="code">tzList</span> 通知列表</td>
+        <td>查询通知类消息（申报截止提醒/缴款到期提醒/政策变更通知等）</td>
+      </tr>
+      <tr>
+        <td>10.4</td>
+        <td class="api-name">异议申诉风险提醒回复</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">yyid</span> 异议ID<br/><span class="code">hfnr</span> 回复内容<br/><span class="code">sfyz</span> 是否认同</td>
+        <td><span class="code">pclsh</span></td>
+        <td>企业对税局发起的异议申诉风险提醒进行回复；回复后税局审核处理</td>
+      </tr>
+      <tr>
+        <td>10.5</td>
+        <td class="api-name">线上征询回复</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">zxid</span> 征询ID<br/><span class="code">hfnr</span> 回复内容<br/><span class="code">fjList</span> 附件</td>
+        <td><span class="code">pclsh</span></td>
+        <td>企业对税局发起的线上征询（如补充资料/情况说明）进行回复；支持附带附件</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块11 优惠备案 -->
+<!-- ============================================================ -->
+<div class="section" id="m11">
+  <div class="phase-badge phase-4">阶段四 · 备案</div>
+  <div class="module-title">模块11　优惠备案</div>
+  <div class="module-desc">上市公司股权激励递延纳税备案信息查询</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:180px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>11.1</td>
+        <td class="api-name">上市公司股权激励递延备案编号查询</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span> 上市公司纳税人识别号<br/><span class="code">zjhm</span> 激励对象证件号码<br/>或 <span class="code">babh</span> 备案编号</td>
+        <td><span class="code">baInfo</span> 备案信息（备案编号/上市公司/激励对象/激励类型/递延额度/备案状态）</td>
+        <td>查询已完成递延纳税备案的股权激励信息；递延备案后激励对象在行权时可暂不纳税，递延至处置时按20%缴纳</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-info">
+    <strong>递延纳税政策：</strong>非上市公司符合条件的股权激励可递延至处置时纳税；
+    上市公司股权激励在行权/解禁时按"工资薪金"缴税（可延长12个月缴纳），
+    符合条件的可递延至处置时按20%财产转让所得缴税。备案编号是申报时的关联凭证。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 模块12 退付手续费核对 -->
+<!-- ============================================================ -->
+<div class="section" id="m12">
+  <div class="phase-badge phase-3">阶段三 · 退付</div>
+  <div class="module-title">模块12　退付手续费核对</div>
+  <div class="module-desc">个税代扣代缴手续费退付的查询、申请与撤销</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th style="width:140px">接口名称</th>
+        <th style="width:70px">类型</th>
+        <th>入参</th>
+        <th>出参</th>
+        <th>处理逻辑</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>12.1</td>
+        <td class="api-name">查询退付手续费</td>
+        <td><span class="tag tag-sync">同步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssq</span> 所属年度</td>
+        <td><span class="code">tfList</span> 退付明细（年度/代扣税额/手续费比例/应退金额/状态）</td>
+        <td>查询年度代扣代缴手续费可退付金额；手续费比例一般为代扣税额的2%；按年度清算</td>
+      </tr>
+      <tr>
+        <td>12.2</td>
+        <td class="api-name">申请手续费退付</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">skssq</span> 所属年度<br/><span class="code">tfse</span> 退付金额<br/><span class="code">skzh</span> 收款账户</td>
+        <td><span class="code">pclsh</span><br/><span class="code">tfuuid</span> 退付申请UUID</td>
+        <td>发起手续费退付申请；需指定收款账户（需与三方协议绑定账户一致）；年度内限申请一次</td>
+      </tr>
+      <tr>
+        <td>12.3</td>
+        <td class="api-name">撤销退费申请</td>
+        <td><span class="tag tag-async">异步</span></td>
+        <td><span class="code">nsrsbh</span><br/><span class="code">tfuuid</span> 退付申请UUID<br/><span class="code">cxyy</span> 撤销原因</td>
+        <td><span class="code">pclsh</span></td>
+        <td>撤销已发起的退付申请；前置条件：退付尚未入账到账</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <strong>手续费退付规则：</strong>扣缴义务人可按代扣代缴税款的<b>2%</b>申请退付手续费。
+    每年度清算一次，需在次年3月30日前申请。手续费可用于代扣代缴工作经费。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 接口清单总表 -->
+<!-- ============================================================ -->
+<div class="section" id="summary">
+  <div class="section-title">接口清单总表</div>
+  <div class="section-subtitle">12大模块 · 全部接口一览</div>
+
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th style="width:40px">序号</th>
+        <th>模块</th>
+        <th>接口名称</th>
+        <th style="width:60px">类型</th>
+        <th>关键入参</th>
+        <th>关键出参</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">1.1</td><td rowspan="5">企业初始化</td><td>单位注册</td><td>异步</td><td>nsrsbh, nsrmc</td><td>djxh</td></tr>
+      <tr><td class="num">1.2</td><td>申报密码上传</td><td>同步</td><td>nsrsbh, sbsmm</td><td>受理结果</td></tr>
+      <tr><td class="num">1.3</td><td>密码校验</td><td>同步</td><td>nsrsbh, sbsmm</td><td>jyzt</td></tr>
+      <tr><td class="num">1.4</td><td>申报密码修改</td><td>同步</td><td>nsrsbh, old/new sbsmm</td><td>修改结果</td></tr>
+      <tr><td class="num">1.5</td><td>查询上市公司信息</td><td>同步</td><td>gsmc/gsdm</td><td>ssgsxx</td></tr>
+      <tr><td class="num">2.1</td><td rowspan="7">人员信息登记报送</td><td>人员报送</td><td>异步</td><td>nsrsbh, ryxxList</td><td>pclsh</td></tr>
+      <tr><td class="num">2.2</td><td>验证状态更新/查询</td><td>同步</td><td>nsrsbh, pclsh/zjhm</td><td>yzzt</td></tr>
+      <tr><td class="num">2.3</td><td>人员作废</td><td>异步</td><td>nsrsbh, ryuuid, zfyy</td><td>pclsh</td></tr>
+      <tr><td class="num">2.4</td><td>人员列表查询</td><td>同步</td><td>nsrsbh, ryzt, xm</td><td>ryList</td></tr>
+      <tr><td class="num">2.5</td><td>自然人并档服务</td><td>同步</td><td>zjlx, zjhm, bdxxList</td><td>zrrbh</td></tr>
+      <tr><td class="num">2.6</td><td>特殊情形处理</td><td>同步</td><td>nsrsbh, tsqxDm, ryxx</td><td>处理结果</td></tr>
+      <tr><td class="num">2.7</td><td>年收入不足6万扣除名单</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>mdList</td></tr>
+      <tr><td class="num">3.1</td><td rowspan="5">专项附加扣除管理</td><td>登记报送</td><td>异步</td><td>nsrsbh, zxzkkcList</td><td>pclsh</td></tr>
+      <tr><td class="num">3.2</td><td>接受反馈</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>fkList</td></tr>
+      <tr><td class="num">3.3</td><td>扣除信息查询</td><td>同步</td><td>nsrsbh, zjhm, skssqq/qz</td><td>kzxx</td></tr>
+      <tr><td class="num">3.4</td><td>暂停名单查询</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>ztmdList</td></tr>
+      <tr><td class="num">3.5</td><td>获取企业所有人扣除金额</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>kchjList</td></tr>
+      <tr><td class="num">4.1</td><td>个人养老金扣除</td><td>个人养老金下载</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>yljList</td></tr>
+      <tr><td class="num">5.1</td><td rowspan="8">算税管理</td><td>异步算税</td><td>异步</td><td>nsrsbh, skssqq/qz</td><td>pclsh</td></tr>
+      <tr><td class="num">5.2</td><td>一月多次算税清空数据</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>清空结果</td></tr>
+      <tr><td class="num">5.3</td><td>获取地区信息</td><td>同步</td><td>sjDm</td><td>dqList</td></tr>
+      <tr><td class="num">5.4</td><td>获取其他单位股权激励信息</td><td>同步</td><td>nsrsbh, zjhm, skssqq/qz</td><td>gqjList</td></tr>
+      <tr><td class="num">5.5</td><td>反算当期收入</td><td>同步</td><td>nsrsbh, zjhm, mbse</td><td>sqse, ynse</td></tr>
+      <tr><td class="num">5.6</td><td>获取累计数据</td><td>同步</td><td>nsrsbh, zjhm, skssq</td><td>ljsj</td></tr>
+      <tr><td class="num">5.7</td><td>全年一次性奖金个税计算</td><td>同步</td><td>jjse</td><td>ynse, sl, sskce</td></tr>
+      <tr><td class="num">5.8</td><td>工资年终奖税筹测算</td><td>同步</td><td>gzse, jjse, skssq</td><td>czfa</td></tr>
+      <tr><td class="num">6.1</td><td rowspan="11">报税管理</td><td>申报任务</td><td>同步</td><td>nsrsbh, skssqq/qz, sblx</td><td>sbuuid, sbzt</td></tr>
+      <tr><td class="num">6.2</td><td>申报提交</td><td>异步</td><td>nsrsbh, sbuuid, sbData</td><td>pclsh</td></tr>
+      <tr><td class="num">6.3</td><td>申报作废</td><td>异步</td><td>nsrsbh, sbuuid, zfyy</td><td>pclsh</td></tr>
+      <tr><td class="num">6.4</td><td>更正申报</td><td>异步</td><td>nsrsbh, sbuuid, gzsbData</td><td>pclsh, gzsbuuid</td></tr>
+      <tr><td class="num">6.5</td><td>撤销更正</td><td>异步</td><td>nsrsbh, gzsbuuid</td><td>pclsh</td></tr>
+      <tr><td class="num">6.6</td><td>正常工资薪金申报</td><td>异步</td><td>nsrsbh, sbuuid, gzxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">6.7</td><td>全年一次性奖金申报</td><td>异步</td><td>nsrsbh, sbuuid, jjxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">6.8</td><td>解除劳动合同补偿金申报</td><td>异步</td><td>nsrsbh, sbuuid, bcxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">6.9</td><td>个人股权激励收入申报</td><td>异步</td><td>nsrsbh, sbuuid, gqjxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">6.10</td><td>一般劳务报酬所得申报</td><td>异步</td><td>nsrsbh, sbuuid, lwxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">6.11</td><td>其他偶然所得申报</td><td>异步</td><td>nsrsbh, sbuuid, orxmList</td><td>pclsh</td></tr>
+      <tr><td class="num">7.1</td><td rowspan="3">缴款管理</td><td>三方协议缴款</td><td>异步</td><td>nsrsbh, sbuuid, yjskse, sfxyh</td><td>pclsh, jkzt</td></tr>
+      <tr><td class="num">7.2</td><td>银联缴款</td><td>同步</td><td>nsrsbh, sbuuid, yjskse</td><td>payUrl, jkdh</td></tr>
+      <tr><td class="num">7.3</td><td>完税证明开具</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>wszmUrl</td></tr>
+      <tr><td class="num">8.1</td><td>漏报检查</td><td>代扣代缴漏报漏缴检查</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>jcjg</td></tr>
+      <tr><td class="num">9.1</td><td rowspan="6">查询统计</td><td>个人扣缴明细查询</td><td>同步</td><td>zjhm, skssqq/qz</td><td>kjmxList</td></tr>
+      <tr><td class="num">9.2</td><td>单位申报记录查询</td><td>同步</td><td>nsrsbh, skssqq/qz, sblx</td><td>sbList</td></tr>
+      <tr><td class="num">9.3</td><td>缴款记录查询</td><td>同步</td><td>nsrsbh, skssqq/qz</td><td>jkList</td></tr>
+      <tr><td class="num">9.4</td><td>员工汇算申报状态查询</td><td>同步</td><td>nsrsbh, skssq</td><td>hsList</td></tr>
+      <tr><td class="num">9.5</td><td>员工未注册个税APP查询</td><td>同步</td><td>nsrsbh, ryList</td><td>wzcList</td></tr>
+      <tr><td class="num">9.6</td><td>个人代开发票明细查询</td><td>同步</td><td>zjhm, skssqq/qz</td><td>fpList</td></tr>
+      <tr><td class="num">10.1</td><td rowspan="5">消息查询</td><td>消息查询</td><td>同步</td><td>nsrsbh, xxlx, skssqq/qz</td><td>xxList</td></tr>
+      <tr><td class="num">10.2</td><td>查询异议申诉属实记录人员</td><td>同步</td><td>nsrsbh, skssq</td><td>ysList</td></tr>
+      <tr><td class="num">10.3</td><td>通知提醒消息查询</td><td>同步</td><td>nsrsbh, tzlx</td><td>tzList</td></tr>
+      <tr><td class="num">10.4</td><td>异议申诉风险提醒回复</td><td>异步</td><td>nsrsbh, yyid, hfnr</td><td>pclsh</td></tr>
+      <tr><td class="num">10.5</td><td>线上征询回复</td><td>异步</td><td>nsrsbh, zxid, hfnr, fjList</td><td>pclsh</td></tr>
+      <tr><td class="num">11.1</td><td>优惠备案</td><td>上市公司股权激励递延备案编号查询</td><td>同步</td><td>nsrsbh, zjhm/babh</td><td>baInfo</td></tr>
+      <tr><td class="num">12.1</td><td rowspan="3">退付手续费核对</td><td>查询退付手续费</td><td>同步</td><td>nsrsbh, skssq</td><td>tfList</td></tr>
+      <tr><td class="num">12.2</td><td>申请手续费退付</td><td>异步</td><td>nsrsbh, skssq, tfse, skzh</td><td>pclsh, tfuuid</td></tr>
+      <tr><td class="num">12.3</td><td>撤销退费申请</td><td>异步</td><td>nsrsbh, tfuuid, cxyy</td><td>pclsh</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- 参数速查表 -->
+<!-- ============================================================ -->
+<div class="section" id="params">
+  <div class="section-title">参数速查表</div>
+  <div class="section-subtitle">英文字段名 ↔ 中文含义</div>
+
+  <table class="api-table">
+    <thead>
+      <tr>
+        <th style="width:140px">英文</th>
+        <th>中文</th>
+        <th style="width:140px">英文</th>
+        <th>中文</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="code">nsrsbh</td><td>纳税人识别号</td><td class="code">djxh</td><td>登记序号</td></tr>
+      <tr><td class="code">nsrmc</td><td>纳税人名称</td><td class="code">swjgDm</td><td>税务机关代码</td></tr>
+      <tr><td class="code">sbuuid</td><td>申报UUID</td><td class="code">gzsbuuid</td><td>更正申报UUID</td></tr>
+      <tr><td class="code">pclsh</td><td>批次流水号</td><td class="code">returncode</td><td>返回码(10处理中/00成功/20失败)</td></tr>
+      <tr><td class="code">skssqq/qz</td><td>税款所属期起/止</td><td class="code">skssq</td><td>税款所属期(年/月)</td></tr>
+      <tr><td class="code">sbsmm</td><td>申报密码</td><td class="code">jyzt</td><td>校验状态(1通过/0失败)</td></tr>
+      <tr><td class="code">zjlx</td><td>证件类型</td><td class="code">zjhm</td><td>证件号码</td></tr>
+      <tr><td class="code">xm</td><td>姓名</td><td class="code">ryuuid</td><td>人员UUID</td></tr>
+      <tr><td class="code">zrrbh</td><td>自然人编号</td><td class="code">yzzt</td><td>验证状态(1待验/2通过/3不通过)</td></tr>
+      <tr><td class="code">czzt</td><td>操作状态(1新增/2修改/3删除)</td><td class="code">zfbz</td><td>作废标志(Y/N)</td></tr>
+      <tr><td class="code">zfyy</td><td>作废原因</td><td class="code">tsqxDm</td><td>特殊情形代码</td></tr>
+      <tr><td class="code">zxzkkc</td><td>专项附加扣除</td><td class="code">kzxx</td><td>扣除信息明细</td></tr>
+      <tr><td class="code">yljList</td><td>养老金明细</td><td class="code">ynse</td><td>应纳税额</td></tr>
+      <tr><td class="code">sdses</td><td>实纳税额</td><td class="code">sqse</td><td>税前收入</td></tr>
+      <tr><td class="code">mbse</td><td>目标税后金额</td><td class="code">ljsj</td><td>累计数据</td></tr>
+      <tr><td class="code">jjse</td><td>奖金金额</td><td class="code">gzse</td><td>工资薪金额</td></tr>
+      <tr><td class="code">sl</td><td>税率</td><td class="code">sskce</td><td>速算扣除数</td></tr>
+      <tr><td class="code">czfa</td><td>测算方案</td><td class="code">yjskse</td><td>应缴税额</td></tr>
+      <tr><td class="code">sfxyh</td><td>三方协议号</td><td class="code">jkzt</td><td>缴款状态</td></tr>
+      <tr><td class="code">jkdh</td><td>缴款单号</td><td class="code">wszmUrl</td><td>完税证明链接</td></tr>
+      <tr><td class="code">tfse</td><td>退付金额</td><td class="code">tfuuid</td><td>退付申请UUID</td></tr>
+      <tr><td class="code">babh</td><td>备案编号</td><td class="code">baInfo</td><td>备案信息</td></tr>
+      <tr><td class="code">xxlx</td><td>消息类型</td><td class="code">yyid</td><td>异议ID</td></tr>
+      <tr><td class="code">zxid</td><td>征询ID</td><td class="code">hfnr</td><td>回复内容</td></tr>
+      <tr><td class="code">accountId</td><td>账号ID(密码校验返回)</td><td class="code">djzclxDm</td><td>登记注册类型代码</td></tr>
+      <tr><td class="code">ykjse</td><td>应扣缴税额</td><td class="code">ljyingkjse</td><td>累计应扣缴税额</td></tr>
+      <tr><td class="code">zcgzxjsfcrlj</td><td>是否下载专附扣(1=不下载)</td><td class="code">jjlxmc</td><td>经济类型名称</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-success" style="margin-top:24px;">
+    <strong>设计完成。</strong>本方案覆盖12大功能模块、55个接口、6类所得申报、累计预扣法算税、年终奖税筹、
+    三方协议/银联缴款、漏报检查、退付手续费等全流程。
+    可按模块逐块开发，建议优先级：模块1→2→3→5→6→7（主链路），其余为辅助功能。
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- 常见问题 FAQ -->
+<!-- ============================================================ -->
+<div class="section" id="faq">
+  <div class="section-title">常见问题 FAQ</div>
+  <div class="section-subtitle">来源：企享云个税申报实际业务问题（共33题）</div>
+
+  <div class="callout callout-info">
+    <strong>FAQ 来源：</strong>企享云 API 文档 <a href="https://openapi.qixiangyun.com/doc-8790158" target="_blank">个税申报-常见问题</a>。
+    以下问题均为实际业务对接中遇到的典型场景与报错，按业务模块分类整理。
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">一、企业初始化 / 账号管理</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q1. 用户确认密码正确，但账密校验请求仍返回密码错误</div>
+    <div class="faq-a"><strong>答：</strong>在确认密码正确的情况下，查看选择的<strong>登记税务机关</strong>是否正确。不同的登记机关，申报密码会有不同的情况。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q2. 多税局企业，首次选择了 A 税局，后面还能修改所属税局吗</div>
+    <div class="faq-a"><strong>答：</strong>可以通过「账号信息上传并校验（申报密码校验）」接口传入新的主管税局，会返回新的 <span class="code">accountId</span> 账号 ID。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q4. 账号信息校验的实名账号和密码是怎么获取的</div>
+    <div class="faq-a"><strong>答：</strong>这个是被授权办税人的<strong>个人所得税的账号和密码</strong>（自然人电子税务局账号）。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q6. 局端接口返回异常: 授权关系校验不通过</div>
+    <div class="faq-a"><strong>答：</strong>登录方式为实名账号登录，但企业并没有授权办税人权限。需要调整为<strong>账号密码登录</strong>（企业税办税员 ≠ 个税办税员）。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q9. 请求参数非法: <span class="code">djzclxDm</span> 不能为空</div>
+    <div class="faq-a"><strong>答：</strong>一般是企业的主管机关问题，需要客户联系专管员处理。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q11. 受理税务机关代码不能为空或空白字符串</div>
+    <div class="faq-a"><strong>答：</strong>一般是企业的主管机关有问题，需要客户联系专管员处理。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q12. 申报失败，扣缴单位无有效的税费种认定信息</div>
+    <div class="faq-a"><strong>答：</strong>两种可能：1. 通过企业注册接口查询是否存在多个主管机关，账号密码上传接口传的<strong>登记序号</strong>是否正确；2. 税局是否有核定，新注册企业或税费种认定到期也会返回该提示。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q27. 期限类别[1]期限代码[01]税务机关代码[XXXXXX]配置信息缺失</div>
+    <div class="faq-a"><strong>答：</strong>税局提示企业主管税务机关信息有问题或不完整，需要企业和税局联系处理。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">二、人员信息登记报送</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q5. 累计减除费用校验不通过：应 ≤ [XXXXX]，实际填写 60000.00</div>
+    <div class="faq-a"><strong>答：</strong>一般为<strong>任职受雇日期报送和实际不符</strong>，税局累计减除费用为 60000 说明这个人去年应该也在这个企业任职。<br/>
+    <span style="color:#888;">注意：当前已支持根据往期累计数自动带入 6 万减除费用的备注，用户可以不传。</span></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q7. 上一属期未按照 6 万扣除累计减除费用</div>
+    <div class="faq-a"><strong>答：</strong>因为人员上个月未按照一次性减除 6 万来申报，所以本期不能传按照 6 万减除的备注。<br/>
+    <span style="color:#888;">注意：当前已支持根据往期累计数自动带入 6 万减除费用的备注，用户可以不传。</span></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q17. 本月超过报送次数，不允许再次报送</div>
+    <div class="faq-a"><strong>答：</strong>税局对当月人员报送次数有限制，根据观察记录，<strong>每月有 150 次限制</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q20. 人员信息与所得项目不匹配</div>
+    <div class="faq-a"><strong>答：</strong>人员报送的<strong>任职受雇类型</strong>和收入不匹配。对应表详见：个税附录。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">三、算税管理</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q3. 发起申报后报错"应扣缴税额不一致，请检查"</div>
+    <div class="faq-a"><strong>答：</strong>排查方向：1. 确认传入的应扣缴税额 <span class="code">ykjse</span> 和算税出来的累计应扣缴税额 <span class="code">ljyingkjse</span> 是否一致（所有员工的合计），可通过「<strong>申报内置算税结果查询</strong>」接口查询；2. 再确认本期收入是否正确，常见不一致是<strong>累计专项扣除</strong>和<strong>专项附加扣除</strong>不一致。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q15. 异步算税 专项附加扣除累计数返回值为 0</div>
+    <div class="faq-a"><strong>答：</strong>1. 确认员工是否归属该扣缴义务人且是否传入了累计专附扣数据；2. 确认请求入参 <span class="code">zcgzxjsfcrlj</span> 值是否为 1，<strong>1 为不下载专项附加信息以传入的为准</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q21. 正常工资薪金当前存在单批次算税，请清空后再进行多次批次算税</div>
+    <div class="faq-a"><strong>答：</strong><strong>同一所属期不能同时使用多批次算税和单批次算税</strong>。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">四、申报管理</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q8. 检测到税款所属期为 4 月的申报数据发生了变动，请同步更正 4 月后的申报数据</div>
+    <div class="faq-a"><strong>答：</strong>4 月属期做过更正申报，<strong>4 月之后的月份要依次按照顺序更正</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q14. 已请求更正申报接口，提示不能远程补报之前的税款所属期</div>
+    <div class="faq-a"><strong>答：</strong>更正申报失败时会恢复之前的申报标记，如果需要再次发起更正申报，需要<strong>重新请求申报更正接口</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q18. 局端接口返回异常: 该笔申报已开票，不允许作废</div>
+    <div class="faq-a"><strong>答：</strong>因为已缴款或缴款中，可查看是否发起过扫码缴款或打印缴款凭证。发起过扫码缴款的需要请求「<a href="https://openapi.qixiangyun.com/api-289103277" target="_blank">电子税票号码作废</a>」接口。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q23. 正常工薪、一次性奖金可以分开申报吗</div>
+    <div class="faq-a"><strong>答：</strong><strong>不能</strong>，综合所得下边的项目要一起发起申报。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q29. 个税更正申报三种情形（A 新增人员；B 减少人员；C 人员不变仅调整收入）系统是否均支持</div>
+    <div class="faq-a"><strong>答：</strong>税局支持的我们都支持：更正本期可以增员；<strong>更正往期不能增员</strong>；减员和人员不变更都支持。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q31. 申报作废后再重新申报提示：税款年度内请勿重复申报</div>
+    <div class="faq-a"><strong>答：</strong><strong>税局作废有延迟的情况</strong>，建议隔天再发起申报。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q32. 开具失败：本地扣缴端不存在属期的申报记录，无法开具完税证明</div>
+    <div class="faq-a"><strong>答：</strong>该纳税人不是在客户端申报的，在网页端申报或者大厅申报的，这种在客户端<strong>开不了完税证明</strong>。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">五、缴款管理</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q10. 三方协议缴款提示未签约，查询能正常返回三方协议号</div>
+    <div class="faq-a"><strong>答：</strong>需客户登录电子税局查看三方协议状态，自然人可能会有<strong>状态同步慢</strong>的情况。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q16. 作废电子税票号提示：订单作废失败，请检查</div>
+    <div class="faq-a"><strong>答：</strong>发起缴款时税局返回异常了，但税局接收到受理订单了，所以作废不了；<strong>隔段时间查询缴款状态或者明天再查询试下</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q22. 缴款书凭证有效期是多长时间</div>
+    <div class="faq-a"><strong>答：</strong>征期内，在征期结束前都可以用。征期后一般都是当天，因为出了征期涉及到<strong>滞纳金</strong>了。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q30. 缴税款失败，"该笔业务正在办理中，请次日查看缴税结果"</div>
+    <div class="faq-a"><strong>答：</strong>这是税局的返回，可以<strong>隔一段时间再次发起缴款，或者次日再次发起缴款查询</strong>。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">六、生产经营所得</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q13. 生产经营B表 —— 该纳税人已申报生产经营B表，不允许继续申报或更正A表</div>
+    <div class="faq-a"><strong>答：</strong>一般客户已经做过<strong>年度申报</strong>，不需要再申报或者调整季度申报数据。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q19. 生产经营：申报更正状态下不能作废，请先撤销更正</div>
+    <div class="faq-a"><strong>答：</strong>生产经营申报是按照投资人申报的，存在部分成功部分失败。如果更正申报后要作废，需要发起<strong>撤销更正</strong>，将更正失败的投资人状态恢复为"未更正"。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q24. 企业注册返回的经济类型名称怎么区分是否是个体户，享受减半征收</div>
+    <div class="faq-a"><strong>答：</strong><span class="code">jjlxmc: "私营独资企业"</span> → 个人独资；<span class="code">jjlxmc: "内资个体"</span> → 个体工商户；<span class="code">jjlxmc: "私营合伙企业"</span> → 有限合伙。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q25. 不支持的征收方式:3 不支持定期定额申报</div>
+    <div class="faq-a"><strong>答：</strong>自然人扣缴客户端不支持定期定额的生产经营申报，这个需要在<strong>电子税局申报增值税时申报定期定额表</strong>。</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q26. 生产经营的个体户减半征收的减免税额怎么计算</div>
+    <div class="faq-a"><strong>答：</strong><span class="code">减免税额 = 应纳税额 - round(应纳税额 × 0.5, 2)</span><br/>
+    <span style="color:#888;">很多客户直接使用 应纳税额×0.5 导致和税局 1 分钱尾差。例如：应纳税额 571.23 → 571.23×0.5=285.615 → 四舍五入 285.62 → 减免税额 = 571.23-285.62 = <strong>285.61</strong></span></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Q33. 经营所得接口设置报税种类需选征收方式，为什么接口还需要传</div>
+    <div class="faq-a"><strong>答：</strong>税局接口需要，手工报不需要是因为客户端本地存储了，但<strong>税局接口没有</strong>，局端接口交互是必需要传的。「获取企业及投资者信息（生产经营）」接口会返回征收方式。</div>
+  </div>
+
+  <h3 class="faq-cat" style="margin-top:24px;color:#185FA5;font-size:14px;font-weight:500;">七、其他 / 枚举对照</h3>
+
+  <div class="faq-item">
+    <div class="faq-q">Q28. 个税减免性质枚举表里"其他非连续劳务报酬"对应哪个所得项目</div>
+    <div class="faq-a"><strong>答：</strong>对应的是<strong>不适用累计减除</strong>的那些所得项目：<span class="code">0401</span> 一般劳务报酬所得、<span class="code">0404</span> 法律援助补贴劳务报酬。</div>
+  </div>
+
+  <div class="callout callout-warning" style="margin-top:24px;">
+    <strong>关键业务规则总结：</strong>
+    <ol style="margin:8px 0 0 20px;padding:0;line-height:1.8;">
+      <li>6 万减除费用已支持自动带入，用户可不传</li>
+      <li>更正本期可增员，更正往期不能增员</li>
+      <li>工资薪金和全年一次性奖金不能分开申报，必须一起</li>
+      <li>同一所属期不能同时使用单批次和多批次算税</li>
+      <li>人员报送每月 150 次限制</li>
+      <li>税局作废有延迟，建议隔天再申报</li>
+      <li>网页端/大厅申报的无法在客户端开具完税证明</li>
+      <li>个体户减半征收：减免税额 = 应纳税额 - round(应纳税额×0.5, 2)，避免直接×0.5 的尾差</li>
+      <li>三方协议：自然人状态同步慢，需登录电子税局确认</li>
+      <li>生产经营征收方式接口必传，客户端本地已存储但税局接口无</li>
+    </ol>
+  </div>
+</div>
+
+<style>
+.faq-item { margin: 12px 0; padding: 12px 16px; border-left: 3px solid #B5D4F4; background: #E6F1FB; border-radius: 0 8px 8px 0; }
+.faq-q { font-size: 13px; font-weight: 500; color: #0C447C; margin-bottom: 6px; }
+.faq-a { font-size: 13px; color: #2C2C2A; line-height: 1.7; }
+.faq-a .code { background: #fff; padding: 1px 5px; border-radius: 3px; font-family: var(--font-mono, monospace); font-size: 12px; color: #993C1D; }
+</style>
+
+  </main>
+</div>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral', sequence: { useMaxWidth: true, showSequenceNumbers: true } });
+
+  // Sidebar active state
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Auto-highlight on scroll
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item');
+  window.addEventListener('scroll', function() {
+    let current = '';
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 100 && rect.bottom >= 100) {
+        current = section.id;
+      }
+    });
+    if (current) {
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.getAttribute('href') === '#' + current);
+      });
+    }
+  });
+</script>
+</body>
+</html>
